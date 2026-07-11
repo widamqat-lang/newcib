@@ -13,12 +13,12 @@ export default function Home() {
 
   const cards = [
     {
-      id: 'silver',
-      name: 'الفئة الفضية',
-      image: '/watch-silver.png',
-      desc: 'أناقة يومية عملية',
-      gradient: 'from-slate-400 to-slate-600'
-    },
+  id: 'silver',
+  name: 'الفئة الفضية',
+  image: 'https://eg.jumia.is/unsafe/fit-in/500x500/filters:fill(white)/product/46/003331/1.jpg?1167',
+  desc: 'أناقة يومية عملية',
+  gradient: 'from-slate-400 to-slate-600'
+},
     {
       id: 'gold',
       name: 'الفئة الذهبية',
