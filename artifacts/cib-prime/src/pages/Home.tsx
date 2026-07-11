@@ -15,21 +15,21 @@ export default function Home() {
     {
   id: 'silver',
   name: 'الفئة الفضية',
-  image: 'https://eg.jumia.is/unsafe/fit-in/500x500/filters:fill(white)/product/46/003331/1.jpg?1167',
+  image: 'https://2b.com.eg/media/catalog/product/cache/661473ab953cdcdf4c3b607144109b90/w/t/wt431_1.jpg',
   desc: 'أناقة يومية عملية',
   gradient: 'from-slate-400 to-slate-600'
 },
     {
       id: 'gold',
       name: 'الفئة الذهبية',
-      image: '/watch-gold.png',
+      image: 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcS4zwmvo6ODcsaMBoYOxcrqbiH0tFge4YloUrFRQ5GFmqZviKHyYiv3vhM&s=10',
       desc: 'فخامة وامتيازات حصرية',
       gradient: 'from-yellow-400 to-yellow-700'
     },
     {
       id: 'black',
       name: 'فئة التيتانيوم',
-      image: '/watch-black.png',
+      image: 'https://dream2000.com/cdn/shop/files/2025-03-16t125815.997.jpg?v=1779596537',
       desc: 'للنخبة فقط',
       gradient: 'from-zinc-700 to-black'
     }
