@@ -1,0 +1,1 @@
+- [Realtime admin/client sync](realtime-admin-sync.md) — how CIB Prime keeps the customer flow and admin panel live-synced over a shared WebSocket.
