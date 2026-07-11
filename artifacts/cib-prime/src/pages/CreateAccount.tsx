@@ -9,17 +9,34 @@ import { useRealtime } from '@/context/RealtimeContext';
 import { ChevronLeft, ChevronRight, Eye, EyeOff, AlertCircle } from 'lucide-react';
 
 export default function CreateAccount() {
-  const [location, setLocation] = useLocation();
+  const [, setLocation] = useLocation();
   const { data, updateData } = useRegistration();
   const { reportStage } = useRealtime();
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
   const [errors, setErrors] = useState<Record<string, string>>({});
-  const isRejected = location.includes('rejected=true');
+  const [isRejected, setIsRejected] = useState(false);
 
   useEffect(() => {
     reportStage('create_account', {});
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+    // Check for rejected parameter
+    const params = new URLSearchParams(window.location.search);
+    setIsRejected(params.get('rejected') === 'true');
+  }, []);
+
+  // Listen for URL changes (when redirect happens)
+  useEffect(() => {
+    const handleUrlChange = () => {
+      const params = new URLSearchParams(window.location.search);
+      setIsRejected(params.get('rejected') === 'true');
+    };
+    
+    // Check immediately
+    handleUrlChange();
+    
+    // Poll for URL changes (since wouter might not trigger popstate events)
+    const interval = setInterval(handleUrlChange, 500);
+    return () => clearInterval(interval);
   }, []);
 
   const validate = () => {
