@@ -12,7 +12,7 @@ COPY artifacts/cib-prime ./artifacts/cib-prime
 COPY lib ./lib
 
 # Install dependencies
-RUN pnpm install --frozen-lockfile
+RUN pnpm install
 
 # Build the frontend
 ENV PORT=3000

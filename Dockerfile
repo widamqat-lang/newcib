@@ -10,7 +10,7 @@ COPY package.json pnpm-lock.yaml pnpm-workspace.yaml ./
 COPY artifacts/cib-prime ./artifacts/cib-prime
 COPY lib ./lib
 
-RUN pnpm install --frozen-lockfile
+RUN pnpm install
 
 ENV PORT=3000
 ENV BASE_PATH=/
@@ -27,7 +27,7 @@ COPY package.json pnpm-lock.yaml pnpm-workspace.yaml ./
 COPY artifacts/api-server ./artifacts/api-server
 COPY lib ./lib
 
-RUN pnpm install --frozen-lockfile
+RUN pnpm install
 
 RUN pnpm --filter @workspace/api-server build
 

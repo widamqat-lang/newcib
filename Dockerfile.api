@@ -12,7 +12,7 @@ COPY artifacts/api-server ./artifacts/api-server
 COPY lib ./lib
 
 # Install dependencies (including workspace packages)
-RUN pnpm install --frozen-lockfile
+RUN pnpm install
 
 # Build the API server
 RUN pnpm --filter @workspace/api-server build
