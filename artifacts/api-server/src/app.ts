@@ -34,7 +34,8 @@ app.use(express.urlencoded({ extended: true }));
 app.use(express.static(path.join(process.cwd(), "public")));
 
 // SPA fallback - serve index.html for all non-API routes
-app.get("*", (req, res) => {
+// Use a named parameter instead of wildcard
+app.get("/{*splat}", (req, res) => {
   if (!req.path.startsWith("/api")) {
     res.sendFile(path.join(process.cwd(), "public", "index.html"));
   }
