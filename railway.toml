@@ -7,6 +7,7 @@
   [apiServer.variables]
     NODE_ENV = "production"
     PORT = "3001"
+    DATABASE_URL = "postgresql://neondb_owner:npg_sXUDcr7dQFZ4@ep-noisy-mode-atmhieni-pooler.c-9.us-east-1.aws.neon.tech/neondb?sslmode=require"
 
 [cibPrime]
   dockerfile = "Dockerfile.frontend"
@@ -16,9 +17,5 @@
     PORT = "3000"
     BASE_PATH = "/"
 
-[db]
-  image = "postgres:15"
-  [db.variables]
-    POSTGRES_DB = "smartwatch"
-    POSTGRES_USER = "postgres"
-    POSTGRES_PASSWORD = "postgres"
+# Note: Using Neon PostgreSQL (external database)
+# No local db service needed
