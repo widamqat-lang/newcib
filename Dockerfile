@@ -33,41 +33,27 @@ RUN pnpm install --ignore-scripts
 
 RUN pnpm --filter @workspace/api-server run build
 
-# Stage 3: Production with nginx and node
+# Stage 3: Production - serve with Node
 FROM node:20-alpine AS production
-
-# Install nginx and dumb-init
-RUN apk add --no-cache nginx dumb-init
-
-# Create directories and set permissions for nginx
-RUN mkdir -p /var/www/html /var/log/nginx /tmp /var/lib/nginx/logs /var/lib/nginx/tmp && \
-    chown -R nginx:nginx /var/www/html /var/log/nginx /var/lib/nginx
-
-# Copy frontend build (v2 - cache busting)
-COPY --from=frontend-builder /app/artifacts/cib-prime/dist /var/www/html
-
-# Copy nginx config to the correct location
-COPY nginx.conf /etc/nginx/nginx.conf
-
-# Copy backend
-COPY --from=backend-builder /app/artifacts/api-server/dist ./app/dist
-COPY --from=backend-builder /app/artifacts/api-server/package.json ./app/
-COPY --from=backend-builder /app/node_modules ./app/node_modules
 
 WORKDIR /app
 
-# Create non-root user
-RUN addgroup -g 1001 -S appgroup && \
-    adduser -u 1001 -S appuser -G appgroup
+# Copy frontend build
+COPY --from=frontend-builder /app/artifacts/cib-prime/dist ./public
 
-RUN chown -R appuser:appgroup /app
+# Copy backend
+COPY --from=backend-builder /app/artifacts/api-server/dist ./dist
+COPY --from=backend-builder /app/artifacts/api-server/package.json ./
+COPY --from=backend-builder /app/node_modules ./node_modules
 
-# Health check for nginx
+# Install serve for static files
+RUN npm install -g serve
+
+# Health check
 HEALTHCHECK --interval=30s --timeout=3s --start-period=5s --retries=3 \
-    CMD wget --no-verbose --tries=1 --spider http://localhost/health || exit 1
+    CMD wget --no-verbose --tries=1 --spider http://localhost:8080/ || exit 1
 
-EXPOSE 3000
+EXPOSE 8080
 
-# Start services as root (nginx needs root to bind to port 80/3000)
-# Use dumb-init to properly handle signals and child processes
-CMD ["dumb-init", "--", "sh", "-c", "nginx -c /etc/nginx/nginx.conf && node --enable-source-maps ./dist/index.mjs"]
+# Start the app - API server will handle routes
+CMD ["node", "--enable-source-maps", "./dist/index.mjs"]
