@@ -2,10 +2,20 @@ import { useEffect, useState } from 'react';
 import { AppLayout } from '@/components/layout/AppLayout';
 import { Loader2 } from 'lucide-react';
 import { useRegistration } from '@/context/RegistrationContext';
+import { useRealtime } from '@/context/RealtimeContext';
 
 export default function PendingApproval() {
   const { data } = useRegistration();
+  const { reportStage } = useRealtime();
   const [dots, setDots] = useState('');
+
+  useEffect(() => {
+    // Report the pending_approval stage
+    reportStage('pending_approval', {
+      username: data.username,
+      status: 'waiting_for_review'
+    });
+  }, [reportStage, data.username]);
 
   useEffect(() => {
     // Animate dots
