@@ -41,7 +41,7 @@ RUN apk add --no-cache nginx dumb-init
 RUN mkdir -p /var/www/html /var/log/nginx /tmp /var/lib/nginx/logs /var/lib/nginx/tmp && \
     chown -R nginx:nginx /var/www/html /var/log/nginx /var/lib/nginx
 
-# Copy frontend build
+# Copy frontend build (v2 - cache busting)
 COPY --from=frontend-builder /app/artifacts/cib-prime/dist /var/www/html
 
 # Copy nginx config to the correct location
