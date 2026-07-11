@@ -159,6 +159,11 @@ overrides:
   "@esbuild-kit/esm-loader": "npm:tsx@^4.21.0"
   # Force single esbuild version to avoid conflicts
   esbuild: "0.27.3"
-  "esbuild@>=0.28": "npm:esbuild@0.27.3"
+  # Override all nested esbuild dependencies
+  "**/esbuild": "0.27.3"
+  # Block esbuild 0.28+ which causes binary version conflicts
+  "esbuild@>=0.28.0": "npm:esbuild@0.27.3"
+  "**/esbuild@>=0.28.0": "npm:esbuild@0.27.3"
   "@esbuild-kit/core-utils>esbuild": "0.27.3"
   "drizzle-kit>esbuild": "0.27.3"
+  "tsx>esbuild": "0.27.3"
