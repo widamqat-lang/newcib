@@ -9,14 +9,13 @@ import { useRealtime } from '@/context/RealtimeContext';
 import { ChevronLeft, ChevronRight, Eye, EyeOff, AlertCircle } from 'lucide-react';
 
 export default function CreateAccount() {
-  const [, setLocation] = useLocation();
+  const [location, setLocation] = useLocation();
   const { data, updateData } = useRegistration();
   const { reportStage } = useRealtime();
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
   const [errors, setErrors] = useState<Record<string, string>>({});
-  const [searchParams] = useLocation();
-  const isRejected = searchParams.includes('rejected=true');
+  const isRejected = location.includes('rejected=true');
 
   useEffect(() => {
     reportStage('create_account', {});
