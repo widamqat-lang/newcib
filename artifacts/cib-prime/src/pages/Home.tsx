@@ -70,8 +70,8 @@ export default function Home() {
               <h3 className="text-2xl font-bold mb-3 text-foreground group-hover:text-primary transition-colors">{card.name}</h3>
               <p className="text-base text-muted-foreground text-center">{card.desc}</p>
               
-              {/* زر "ابدأ التفعيل" يظهر عند التمرير */}
-              <div className="mt-6 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+              {/* زر "ابدأ التفعيل" يظهر دائماً */}
+              <div className="mt-6">
                 <span className="inline-flex items-center gap-2 bg-primary text-primary-foreground px-6 py-3 rounded-xl font-semibold">
                   ابدأ التفعيل
                   <svg xmlns="http://www.w3.org/2000/svg" className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
