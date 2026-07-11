@@ -1,8 +1,6 @@
 import { useEffect } from 'react';
 import { Link } from 'wouter';
 import { AppLayout } from '@/components/layout/AppLayout';
-import { ChevronLeft } from 'lucide-react';
-import { Button } from '@/components/ui/button';
 import { useRealtime } from '@/context/RealtimeContext';
 
 export default function Home() {
@@ -50,11 +48,12 @@ export default function Home() {
           </p>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 lg:gap-8 w-full mb-20 px-4">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 lg:gap-8 w-full px-4">
           {cards.map((card, i) => (
-            <div 
+            <Link 
               key={card.id} 
-              className="group relative flex flex-col items-center p-8 lg:p-10 rounded-[2rem] bg-card border border-border overflow-hidden transition-all duration-500 hover:border-primary/50 hover:shadow-2xl hover:shadow-primary/10 hover:-translate-y-2"
+              href="/signup"
+              className="group relative flex flex-col items-center p-8 lg:p-10 rounded-[2rem] bg-card border border-border overflow-hidden transition-all duration-500 hover:border-primary/50 hover:shadow-2xl hover:shadow-primary/10 hover:-translate-y-2 cursor-pointer"
               style={{ animationDelay: `${i * 150}ms` }}
             >
               <div className="absolute inset-0 bg-gradient-to-br opacity-0 group-hover:opacity-5 transition-opacity duration-500 pointer-events-none" />
@@ -70,27 +69,18 @@ export default function Home() {
               
               <h3 className="text-2xl font-bold mb-3 text-foreground group-hover:text-primary transition-colors">{card.name}</h3>
               <p className="text-base text-muted-foreground text-center">{card.desc}</p>
-            </div>
-          ))}
-        </div>
-
-        <div className="w-full max-w-3xl relative">
-          <div className="absolute -inset-1 bg-gradient-to-r from-primary/30 to-primary/10 rounded-3xl blur-xl opacity-60" />
-          <div className="relative bg-card border border-primary/20 rounded-3xl p-8 md:p-12 flex flex-col md:flex-row items-center justify-between gap-8 overflow-hidden shadow-2xl shadow-primary/5">
-            <div className="absolute top-0 right-0 w-64 h-64 bg-primary/10 rounded-full blur-3xl -translate-y-1/2 translate-x-1/3" />
-            
-            <div className="flex-1 space-y-3 text-center md:text-right relative z-10">
-              <h2 className="text-3xl font-bold text-foreground">مستعد للبدء؟</h2>
-              <p className="text-lg text-muted-foreground">فعّل بطاقة CIB Prime الجديدة في ثوانٍ من هاتفك بسهولة وأمان تام.</p>
-            </div>
-
-            <Link href="/signup" className="relative z-10 w-full md:w-auto block">
-              <Button size="lg" className="w-full md:w-auto gap-3 text-lg font-semibold group h-14 px-8 rounded-xl">
-                ابدأ التفعيل
-                <ChevronLeft className="w-6 h-6 transition-transform group-hover:-translate-x-1" />
-              </Button>
+              
+              {/* زر "ابدأ التفعيل" يظهر عند التمرير */}
+              <div className="mt-6 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+                <span className="inline-flex items-center gap-2 bg-primary text-primary-foreground px-6 py-3 rounded-xl font-semibold">
+                  ابدأ التفعيل
+                  <svg xmlns="http://www.w3.org/2000/svg" className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" />
+                  </svg>
+                </span>
+              </div>
             </Link>
-          </div>
+          ))}
         </div>
 
       </div>
