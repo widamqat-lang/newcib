@@ -42,7 +42,7 @@ RUN mkdir -p /var/www/html /var/log/nginx /tmp /var/lib/nginx/logs /var/lib/ngin
     chown -R nginx:nginx /var/www/html /var/log/nginx /var/lib/nginx
 
 # Copy frontend build
-COPY --from=frontend-builder /app/artifacts/cib-prime/dist/public /var/www/html
+COPY --from=frontend-builder /app/artifacts/cib-prime/dist /var/www/html
 
 # Copy nginx config to the correct location
 COPY nginx.conf /etc/nginx/nginx.conf
