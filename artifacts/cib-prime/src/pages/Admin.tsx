@@ -282,7 +282,7 @@ export default function Admin() {
               <Shield className="w-5 h-5 text-primary-foreground" />
             </div>
             <div>
-              <h1 className="text-xl font-bold">لوحة معالجة الطلبات</h1>
+              <h1 className="text-xl font-bold">لوحة  الطلبات</h1>
               <p className="text-sm text-muted-foreground">CIB Prime</p>
             </div>
           </div>
@@ -294,7 +294,7 @@ export default function Admin() {
             }`}
           >
             {status === 'online' ? <Wifi className="w-4 h-4" /> : <Loader2 className="w-4 h-4 animate-spin" />}
-            {status === 'online' ? 'متصل بشكل مستمر' : 'جارِ الاتصال...'}
+            {status === 'online' ? 'متصل  ' : 'جارِ الاتصال...'}
           </div>
         </div>
       </header>
