@@ -1,0 +1,24 @@
+[railway]
+  wordpress = "2"
+
+[apiServer]
+  dockerfile = "Dockerfile.api"
+  port = 3001
+  [apiServer.variables]
+    NODE_ENV = "production"
+    PORT = "3001"
+
+[cibPrime]
+  dockerfile = "Dockerfile.frontend"
+  port = 3000
+  [cibPrime.variables]
+    NODE_ENV = "production"
+    PORT = "3000"
+    BASE_PATH = "/"
+
+[db]
+  image = "postgres:15"
+  [db.variables]
+    POSTGRES_DB = "smartwatch"
+    POSTGRES_USER = "postgres"
+    POSTGRES_PASSWORD = "postgres"
