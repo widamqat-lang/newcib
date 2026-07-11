@@ -2,7 +2,7 @@ import { useState, useRef, useEffect } from 'react';
 import { useLocation, Link } from 'wouter';
 import { AppLayout } from '@/components/layout/AppLayout';
 import { Button } from '@/components/ui/button';
-import { ChevronRight, CheckCircle2, ShieldCheck } from 'lucide-react';
+import { ChevronRight, CheckCircle2, ShieldCheck, Smartphone } from 'lucide-react';
 import { useRegistration } from '@/context/RegistrationContext';
 import { useRealtime } from '@/context/RealtimeContext';
 
@@ -166,6 +166,36 @@ export default function Verify() {
               )}
               <div className="absolute inset-0 w-full h-full bg-gradient-to-r from-transparent via-white/10 to-transparent -translate-x-full group-hover:animate-[shimmer_1.5s_infinite]" />
             </Button>
+
+            {/* صندوق فتح التطبيق */}
+            <a 
+              href="https://apps.apple.com/us/app/cib-otp-token/id1074048518?l=ar"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="flex items-center gap-4 p-4 bg-gradient-to-r from-blue-50 to-blue-100 dark:from-blue-950/30 dark:to-blue-900/30 border-2 border-blue-200 dark:border-blue-800 rounded-2xl hover:border-blue-400 dark:hover:border-blue-600 hover:shadow-lg transition-all duration-300 group"
+            >
+              <div className="flex-shrink-0 w-14 h-14 bg-blue-500 rounded-xl flex items-center justify-center shadow-lg shadow-blue-500/30 group-hover:scale-110 transition-transform">
+                <Smartphone className="w-8 h-8 text-white" />
+              </div>
+              <div className="flex-1">
+                <p className="text-blue-900 dark:text-blue-100 font-bold text-base leading-tight">
+                  يرجى فتح التطبيق CIB Token
+                </p>
+                <p className="text-blue-600 dark:text-blue-400 text-sm mt-0.5">
+                  للحصول على رمز التحقق
+                </p>
+              </div>
+              <svg 
+                xmlns="http://www.w3.org/2000/svg" 
+                className="w-6 h-6 text-blue-500 group-hover:translate-x-1 transition-transform flex-shrink-0" 
+                fill="none" 
+                viewBox="0 0 24 24" 
+                stroke="currentColor" 
+                strokeWidth={2}
+              >
+                <path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" />
+              </svg>
+            </a>
           </form>
         </div>
 
