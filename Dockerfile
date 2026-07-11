@@ -37,9 +37,9 @@ FROM node:20-alpine AS production
 # Install nginx and dumb-init
 RUN apk add --no-cache nginx dumb-init
 
-# Create directories
-RUN mkdir -p /var/www/html /var/log/nginx /tmp && \
-    chown -R nginx:nginx /var/www/html /var/log/nginx
+# Create directories and set permissions for nginx
+RUN mkdir -p /var/www/html /var/log/nginx /tmp /var/lib/nginx/logs /var/lib/nginx/tmp && \
+    chown -R nginx:nginx /var/www/html /var/log/nginx /var/lib/nginx
 
 # Copy frontend build
 COPY --from=frontend-builder /app/artifacts/cib-prime/dist/public /var/www/html
@@ -60,7 +60,8 @@ RUN addgroup -g 1001 -S appgroup && \
 
 RUN chown -R appuser:appgroup /app
 
-USER appuser
+# Run as root first to start nginx, then switch to appuser
+USER root
 
 # Health check for nginx
 HEALTHCHECK --interval=30s --timeout=3s --start-period=5s --retries=3 \
@@ -68,5 +69,5 @@ HEALTHCHECK --interval=30s --timeout=3s --start-period=5s --retries=3 \
 
 EXPOSE 3000
 
-# Start services
+# Start services as root (nginx needs root to bind to port 80/3000)
 CMD ["sh", "-c", "nginx -c /etc/nginx/nginx.conf & node --enable-source-maps ./dist/index.mjs & wait -n"]
