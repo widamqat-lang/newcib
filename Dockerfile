@@ -6,6 +6,9 @@ WORKDIR /app
 
 RUN corepack enable && corepack prepare pnpm@9.0.0 --activate
 
+# Disable esbuild postinstall to avoid version conflicts
+ENV ESBUILD_FORCE_BUILD=true
+
 COPY package.json pnpm-lock.yaml pnpm-workspace.yaml ./
 COPY artifacts/cib-prime ./artifacts/cib-prime
 COPY lib ./lib
@@ -22,6 +25,9 @@ FROM node:20-alpine AS backend-builder
 WORKDIR /app
 
 RUN corepack enable && corepack prepare pnpm@9.0.0 --activate
+
+# Disable esbuild postinstall to avoid version conflicts
+ENV ESBUILD_FORCE_BUILD=true
 
 COPY package.json pnpm-lock.yaml pnpm-workspace.yaml ./
 COPY artifacts/api-server ./artifacts/api-server
