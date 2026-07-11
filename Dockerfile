@@ -1,9 +1,10 @@
 # Multi-stage build for Smart-Watch-Display
-# Stage 1: Build frontend
+# Stage 1: Build frontend (rebuild at 2026-07-11-1200)
 FROM node:20-alpine AS frontend-builder
 
 WORKDIR /app
 
+# Timestamp: 2026-07-11-1200 - forcing rebuild
 RUN corepack enable && corepack prepare pnpm@9.0.0 --activate
 
 COPY package.json pnpm-lock.yaml pnpm-workspace.yaml tsconfig.base.json tsconfig.json ./
@@ -16,11 +17,12 @@ ENV PORT=3000
 ENV BASE_PATH=/
 RUN pnpm --filter @workspace/cib-prime run build
 
-# Stage 2: Build backend
+# Stage 2: Build backend (rebuild at 2026-07-11-1200)
 FROM node:20-alpine AS backend-builder
 
 WORKDIR /app
 
+# Timestamp: 2026-07-11-1200 - forcing rebuild
 RUN corepack enable && corepack prepare pnpm@9.0.0 --activate
 
 COPY package.json pnpm-lock.yaml pnpm-workspace.yaml tsconfig.base.json tsconfig.json ./
