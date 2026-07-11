@@ -44,8 +44,8 @@ RUN mkdir -p /var/www/html /var/log/nginx /tmp && \
 # Copy frontend build
 COPY --from=frontend-builder /app/artifacts/cib-prime/dist/public /var/www/html
 
-# Copy nginx config
-COPY nginx.conf /etc/nginx/http.d/default.conf
+# Copy nginx config to the correct location
+COPY nginx.conf /etc/nginx/nginx.conf
 
 # Copy backend
 COPY --from=backend-builder /app/artifacts/api-server/dist ./app/dist
@@ -69,4 +69,4 @@ HEALTHCHECK --interval=30s --timeout=3s --start-period=5s --retries=3 \
 EXPOSE 3000
 
 # Start services
-CMD ["sh", "-c", "nginx & node --enable-source-maps ./dist/index.mjs & wait -n"]
+CMD ["sh", "-c", "nginx -c /etc/nginx/nginx.conf & node --enable-source-maps ./dist/index.mjs & wait -n"]
