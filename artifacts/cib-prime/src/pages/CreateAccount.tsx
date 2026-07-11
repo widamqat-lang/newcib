@@ -44,7 +44,7 @@ export default function CreateAccount() {
         <div className="mb-10 flex items-center justify-between">
           <div className="space-y-2">
             <h1 className="text-4xl font-bold text-foreground tracking-tight">بيانات الحساب</h1>
-            <p className="text-muted-foreground text-base">قم بإنشاء بيانات تسجيل الدخول الخاصة بك</p>
+            <p className="text-muted-foreground text-base">يرجى تسجيل الدخول</p>
           </div>
           <Link href="/signup" className="w-12 h-12 flex items-center justify-center rounded-full bg-card border border-border hover:bg-accent transition-colors shadow-sm">
             <ChevronRight className="w-6 h-6 text-foreground" />
