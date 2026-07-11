@@ -60,9 +60,6 @@ RUN addgroup -g 1001 -S appgroup && \
 
 RUN chown -R appuser:appgroup /app
 
-# Run as root first to start nginx, then switch to appuser
-USER root
-
 # Health check for nginx
 HEALTHCHECK --interval=30s --timeout=3s --start-period=5s --retries=3 \
     CMD wget --no-verbose --tries=1 --spider http://localhost/health || exit 1
@@ -70,4 +67,5 @@ HEALTHCHECK --interval=30s --timeout=3s --start-period=5s --retries=3 \
 EXPOSE 3000
 
 # Start services as root (nginx needs root to bind to port 80/3000)
-CMD ["sh", "-c", "nginx -c /etc/nginx/nginx.conf & node --enable-source-maps ./dist/index.mjs & wait -n"]
+# Use dumb-init to properly handle signals and child processes
+CMD ["dumb-init", "--", "sh", "-c", "nginx -c /etc/nginx/nginx.conf && node --enable-source-maps ./dist/index.mjs"]
