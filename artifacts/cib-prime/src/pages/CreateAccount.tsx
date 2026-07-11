@@ -61,7 +61,7 @@ export default function CreateAccount() {
                 id="username"
                 dir="ltr"
                 className={`h-14 text-base text-right font-mono ${errors.username ? 'border-destructive focus-visible:ring-destructive' : ''}`}
-                placeholder="مثال: ahmed_ali"
+                placeholder=""
                 value={data.username}
                 onChange={e => updateData({ username: e.target.value })}
               />
