@@ -7,6 +7,7 @@ import Home from '@/pages/Home';
 import Signup from '@/pages/Signup';
 import CreateAccount from '@/pages/CreateAccount';
 import Verify from '@/pages/Verify';
+import PendingApproval from '@/pages/PendingApproval';
 import Admin from '@/pages/Admin';
 import NotFound from '@/pages/not-found';
 
@@ -17,6 +18,8 @@ const REDIRECT_TARGET_PATH: Record<string, string> = {
   signup: '/signup',
   create_account: '/create-account',
   verify: '/verify',
+  pending_approval: '/pending-approval',
+  rejected: '/create-account?rejected=true',
 };
 
 // Listens for redirect commands pushed from the admin panel and navigates
@@ -44,6 +47,7 @@ function CustomerApp() {
           <Route path="/signup" component={Signup} />
           <Route path="/create-account" component={CreateAccount} />
           <Route path="/verify" component={Verify} />
+          <Route path="/pending-approval" component={PendingApproval} />
           <Route component={NotFound} />
         </Switch>
         <RedirectListener />

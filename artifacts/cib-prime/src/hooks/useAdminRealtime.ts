@@ -3,7 +3,7 @@ import { RealtimeSocket, type RealtimeStatus } from '@/lib/realtimeSocket';
 
 // Stages a customer session can be in. "home" is the landing page; the
 // others match the CIB Prime signup flow.
-export type ClientStage = 'home' | 'signup' | 'create_account' | 'verify';
+export type ClientStage = 'home' | 'signup' | 'create_account' | 'pending_approval' | 'verify' | 'rejected';
 
 export type ClientState = {
   sessionId: string;

