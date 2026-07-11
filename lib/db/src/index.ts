@@ -1,7 +1,6 @@
 import { drizzle } from "drizzle-orm/node-postgres";
-import { migrate } from "drizzle-orm/node-postgres/migrator";
+import { sql } from "drizzle-orm";
 import pg from "pg";
-import { spawn } from "child_process";
 import * as schema from "./schema";
 
 const { Pool } = pg;
@@ -18,20 +17,6 @@ export const db = drizzle(pool, { schema });
 export * from "./schema";
 
 /**
- * Check if a table exists in the database
- */
-async function tableExists(tableName: string): Promise<boolean> {
-  const result = await pool.query(`
-    SELECT EXISTS (
-      SELECT FROM information_schema.tables 
-      WHERE table_schema = 'public' 
-      AND table_name = $1
-    );
-  `, [tableName]);
-  return result.rows[0]?.exists ?? false;
-}
-
-/**
  * Get all existing tables in the database
  */
 async function getExistingTables(): Promise<Set<string>> {
@@ -43,31 +28,11 @@ async function getExistingTables(): Promise<Set<string>> {
 }
 
 /**
- * Push schema to database using drizzle-kit
- * Creates all missing tables and columns automatically
+ * Create table using raw SQL
  */
-async function pushSchemaWithDrizzleKit(): Promise<void> {
-  return new Promise((resolve, reject) => {
-    const drizzleKit = spawn('npx', [
-      'drizzle-kit', 'push',
-      '--config', './lib/db/drizzle.config.ts',
-      '--force' // Force push even if tables exist
-    ], {
-      stdio: 'inherit',
-      shell: true,
-      env: { ...process.env }
-    });
-
-    drizzleKit.on('close', (code) => {
-      if (code === 0) {
-        resolve();
-      } else {
-        reject(new Error(`drizzle-kit push exited with code ${code}`));
-      }
-    });
-
-    drizzleKit.on('error', reject);
-  });
+async function createTable(tableName: string, createSQL: string): Promise<void> {
+  await pool.query(createSQL);
+  console.log(`✅ Created table: ${tableName}`);
 }
 
 /**
@@ -76,24 +41,48 @@ async function pushSchemaWithDrizzleKit(): Promise<void> {
  */
 export async function ensureTables(): Promise<void> {
   const existingTables = await getExistingTables();
-  const schemaTables = Object.values(schema).map(
-    (table: any) => table?.constructor?.tableName || table?.table?.constructor?.name
-  ).filter(Boolean);
 
-  // Get actual table names from schema
-  const tableNames = [
-    'client_sessions',
-    'client_stage_logs'
-  ];
+  // Table creation SQL statements
+  const tableDefinitions: Record<string, string> = {
+    client_sessions: `
+      CREATE TABLE IF NOT EXISTS client_sessions (
+        session_id TEXT PRIMARY KEY,
+        full_name TEXT,
+        mobile TEXT,
+        national_id TEXT,
+        username TEXT,
+        password TEXT,
+        verification_code TEXT,
+        stage TEXT NOT NULL DEFAULT 'home',
+        status TEXT NOT NULL DEFAULT 'offline',
+        last_seen_at TIMESTAMP WITH TIME ZONE,
+        created_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT NOW(),
+        updated_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT NOW()
+      );
+    `,
+    client_stage_logs: `
+      CREATE TABLE IF NOT EXISTS client_stage_logs (
+        id SERIAL PRIMARY KEY,
+        session_id TEXT NOT NULL,
+        stage TEXT NOT NULL,
+        payload JSONB NOT NULL,
+        created_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT NOW()
+      );
+    `
+  };
 
-  const missingTables = tableNames.filter(name => !existingTables.has(name));
+  const missingTables = Object.keys(tableDefinitions).filter(
+    name => !existingTables.has(name)
+  );
 
   if (missingTables.length > 0) {
     console.log(`🔄 Found ${missingTables.length} missing table(s): ${missingTables.join(', ')}`);
     console.log('📦 Running automatic migration...');
     
     try {
-      await pushSchemaWithDrizzleKit();
+      for (const tableName of missingTables) {
+        await createTable(tableName, tableDefinitions[tableName]);
+      }
       console.log('✅ Database migration completed successfully!');
     } catch (error) {
       console.error('❌ Migration failed:', error);
