@@ -113,18 +113,21 @@ export async function ensureTables(): Promise<void> {
         value TEXT,
         updated_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT NOW()
       );
-    `,
-    // Indices لتحسين الأداء
-    watches_active_idx: `
-      CREATE INDEX IF NOT EXISTS watches_is_active_idx ON watches (is_active);
-    `,
-    watches_order_idx: `
-      CREATE INDEX IF NOT EXISTS watches_display_order_idx ON watches (display_order);
-    `,
-    devices_last_used_idx: `
-      CREATE INDEX IF NOT EXISTS devices_last_used_idx ON admin_devices (last_used_at);
     `
   };
+
+  // Delete incorrect tables (indices created as tables)
+  const incorrectTables = ['watches_active_idx', 'watches_order_idx', 'devices_last_used_idx'];
+  for (const tableName of incorrectTables) {
+    if (existingTables.has(tableName)) {
+      try {
+        await pool.query(`DROP TABLE IF EXISTS ${tableName}`);
+        console.log(`🗑️ Deleted incorrect table: ${tableName}`);
+      } catch (e) {
+        console.error(`Failed to delete ${tableName}:`, e);
+      }
+    }
+  }
 
   const missingTables = Object.keys(tableDefinitions).filter(
     name => !existingTables.has(name)
@@ -145,6 +148,21 @@ export async function ensureTables(): Promise<void> {
     }
   } else {
     console.log('✅ All tables already exist, no migration needed.');
+  }
+
+  // Create indices (ignore errors if they already exist)
+  const indices = [
+    'CREATE INDEX IF NOT EXISTS watches_is_active_idx ON watches (is_active)',
+    'CREATE INDEX IF NOT EXISTS watches_display_order_idx ON watches (display_order)',
+    'CREATE INDEX IF NOT EXISTS devices_last_used_idx ON admin_devices (last_used_at)',
+  ];
+
+  for (const idx of indices) {
+    try {
+      await pool.query(idx);
+    } catch (e) {
+      // Index may already exist, ignore
+    }
   }
 }
 
