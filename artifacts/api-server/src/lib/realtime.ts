@@ -469,4 +469,85 @@ export function notifyAdminsOfAgentRequest(data: AgentRequestData): void {
   for (const admin of adminSockets) {
     safeSend(admin, notification);
   }
+  
+  // Also notify SSE subscribers
+  notifyAdminSubscribers({
+    type: "agent_request",
+    data: data,
+    priority: "high",
+    sound: true
+  });
+}
+
+// ============================================
+// SSE Subscription Support
+// ============================================
+
+// Subscribers for conversation messages (SSE)
+type MessageCallback = (message: unknown) => void;
+const conversationSubscribers = new Map<number, Set<MessageCallback>>();
+
+// Subscribers for admin notifications (SSE)
+const adminSubscribers = new Set<MessageCallback>();
+
+/**
+ * Subscribe to messages for a specific conversation (for SSE)
+ */
+export function subscribeToConversation(conversationId: number, callback: MessageCallback): () => void {
+  if (!conversationSubscribers.has(conversationId)) {
+    conversationSubscribers.set(conversationId, new Set());
+  }
+  conversationSubscribers.get(conversationId)!.add(callback);
+  
+  // Return unsubscribe function
+  return () => {
+    const subs = conversationSubscribers.get(conversationId);
+    if (subs) {
+      subs.delete(callback);
+      if (subs.size === 0) {
+        conversationSubscribers.delete(conversationId);
+      }
+    }
+  };
+}
+
+/**
+ * Subscribe to all admin notifications (for SSE)
+ */
+export function subscribeToAdminNotifications(callback: MessageCallback): () => void {
+  adminSubscribers.add(callback);
+  
+  // Return unsubscribe function
+  return () => {
+    adminSubscribers.delete(callback);
+  };
+}
+
+/**
+ * Notify subscribers of a new message in a conversation
+ */
+export function notifyConversationSubscribers(conversationId: number, message: unknown): void {
+  const subs = conversationSubscribers.get(conversationId);
+  if (subs) {
+    for (const callback of subs) {
+      try {
+        callback(message);
+      } catch (err) {
+        console.error("[SUBSCRIBER] Error in message callback:", err);
+      }
+    }
+  }
+}
+
+/**
+ * Notify all admin subscribers
+ */
+export function notifyAdminSubscribers(data: unknown): void {
+  for (const callback of adminSubscribers) {
+    try {
+      callback(data);
+    } catch (err) {
+      console.error("[SUBSCRIBER] Error in admin callback:", err);
+    }
+  }
 }

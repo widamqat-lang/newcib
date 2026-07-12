@@ -2,7 +2,7 @@ import { Router } from "express";
 import { eq, desc, and, sql } from "drizzle-orm";
 import { db, conversationsTable, messagesTable, clientSessionsTable, conversationSummariesTable } from "@workspace/db";
 import { LocalAI } from "../lib/localAI";
-import { notifyAdminsOfAgentRequest } from "../lib/realtime";
+import { notifyAdminsOfAgentRequest, notifyConversationSubscribers, notifyAdminSubscribers } from "../lib/realtime";
 import { sessions, SESSION_DURATION_HOURS } from "../lib/sessions";
 
 const router = Router();
@@ -238,6 +238,25 @@ router.post("/:id/messages", async (req, res) => {
       })
       .where(eq(conversationsTable.id, conversationId));
 
+    // إشعار المدير عند رسالة جديدة من العميل
+    if (senderType === "client") {
+      notifyAdminSubscribers({
+        type: "conversation_update",
+        conversationId,
+        message
+      });
+    }
+
+    // إشعار العميل عند رسالة جديدة من الموظف
+    if (senderType === "agent") {
+      notifyConversationSubscribers(conversationId, {
+        type: "new_message",
+        senderType: "agent",
+        senderId: senderId || "admin",
+        content: content
+      });
+    }
+
     // إذا كانت الرسالة من العميل
     if (senderType === "client") {
       console.log("[MESSAGES] Processing client message...");
@@ -335,6 +354,13 @@ router.post("/:id/messages", async (req, res) => {
           conversationId,
           senderType: "bot",
           content: aiResult.reply,
+        });
+        
+        // إشعار الـ SSE subscribers بالرسالة الجديدة
+        notifyConversationSubscribers(conversationId, {
+          type: "new_message",
+          senderType: "bot",
+          content: aiResult.reply
         });
       }
 
@@ -492,6 +518,14 @@ router.post("/:id/connect", requireAdminAuth, async (req, res) => {
       senderId: agentId || "admin",
       content: "مرحباً بك! 👋\n\nأنا أحد ممثلي خدمة عملاء CIB Prime.\n\nيرجى إرسال استفسارك وسأقوم بمساعدتك. 😊",
     });
+    
+    // إشعار العميل عبر SSE
+    notifyConversationSubscribers(conversationId, {
+      type: "new_message",
+      senderType: "agent",
+      senderId: agentId || "admin",
+      content: "مرحباً بك! 👋\n\nأنا أحد ممثلي خدمة عملاء CIB Prime.\n\nيرجى إرسال استفسارك وسأقوم بمساعدتك. 😊"
+    });
 
     res.json({ success: true, message: "تم بدء المحادثة مع العميل" });
   } catch (error: any) {
@@ -534,6 +568,13 @@ router.post("/:id/close", requireAdminAuth, async (req, res) => {
       content: `📋 تم إنهاء المحادثة مع الموظف.\n\nيسعدنا مساعدتك مجدداً! 😊\n\n• اكتب استفسارك للتحدث مع المساعد الذكي\n• اكتب "التواصل مع الموظف" للتحدث مع أحد ممثلي خدمة العملاء`,
     });
 
+    // إشعار العميل عبر SSE
+    notifyConversationSubscribers(conversationId, {
+      type: "new_message",
+      senderType: "bot",
+      content: `📋 تم إنهاء المحادثة مع الموظف.\n\nيسعدنا مساعدتك مجدداً! 😊\n\n• اكتب استفسارك للتحدث مع المساعد الذكي\n• اكتب "التواصل مع الموظف" للتحدث مع أحد ممثلي خدمة العملاء`
+    });
+
     console.log("[CLOSE] Conversation ended, bot reactivated for conversation:", conversationId);
     res.json({ success: true, message: "تم إنهاء المحادثة وإعادة تفعيل المساعد الذكي" });
   } catch (error: any) {
@@ -560,6 +601,71 @@ router.patch("/:id/ping", async (req, res) => {
     console.error("❌ [PING] Error:", error.message || error);
     res.status(500).json({ success: false, error: "فشل في تحديث الحالة" });
   }
+});
+
+// SSE endpoint للمحادثات (للعميل)
+router.get("/:id/stream", async (req, res) => {
+  const { id } = req.params;
+  const conversationId = parseInt(id);
+
+  // Set headers for SSE
+  res.setHeader('Content-Type', 'text/event-stream');
+  res.setHeader('Cache-Control', 'no-cache');
+  res.setHeader('Connection', 'keep-alive');
+  res.setHeader('Access-Control-Allow-Origin', '*');
+  res.flushHeaders();
+
+  console.log(`[SSE] Client connected to conversation ${conversationId}`);
+
+  // Function to send message event
+  const sendMessage = (message: any) => {
+    res.write(`event: message\ndata: ${JSON.stringify(message)}\n\n`);
+  };
+
+  // Subscribe to this conversation
+  const { subscribeToConversation } = await import('../lib/realtime');
+  const unsubscribe = subscribeToConversation(conversationId, sendMessage);
+
+  // Keep connection alive with heartbeat
+  const heartbeat = setInterval(() => {
+    res.write(`: heartbeat\n\n`);
+  }, 30000);
+
+  // Cleanup on close
+  req.on('close', () => {
+    console.log(`[SSE] Client disconnected from conversation ${conversationId}`);
+    clearInterval(heartbeat);
+    unsubscribe();
+  });
+});
+
+// SSE endpoint للمدير (جميع المحادثات)
+router.get("/admin/stream", requireAdminAuth, async (req, res) => {
+  // Set headers for SSE
+  res.setHeader('Content-Type', 'text/event-stream');
+  res.setHeader('Cache-Control', 'no-cache');
+  res.setHeader('Connection', 'keep-alive');
+  res.setHeader('Access-Control-Allow-Origin', '*');
+  res.flushHeaders();
+
+  console.log('[SSE] Admin connected');
+
+  // Send heartbeat
+  const heartbeat = setInterval(() => {
+    res.write(`: heartbeat\n\n`);
+  }, 30000);
+
+  // Subscribe to all admin events
+  const { subscribeToAdminNotifications } = await import('../lib/realtime');
+  const unsubscribe = subscribeToAdminNotifications((data) => {
+    res.write(`event: ${data.type}\ndata: ${JSON.stringify(data)}\n\n`);
+  });
+
+  req.on('close', () => {
+    console.log('[SSE] Admin disconnected');
+    clearInterval(heartbeat);
+    unsubscribe();
+  });
 });
 
 // جلب آخر الرسائل (للـ polling) - يتطلب auth للمدير

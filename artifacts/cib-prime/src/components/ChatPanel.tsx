@@ -163,12 +163,54 @@ export function ChatPanel({ isOpen, onClose, isAdminConnected }: ChatPanelProps)
   useEffect(() => {
     if (!isOpen) return;
     
+    // SSE للوحة الإدارة
+    let eventSource: EventSource;
+    
+    const connectAdminSSE = () => {
+      const token = localStorage.getItem('admin_token');
+      if (!token) return;
+      
+      eventSource = new EventSource(`/api/conversations/admin/stream`);
+      
+      eventSource.onmessage = (event) => {
+        try {
+          const data = JSON.parse(event.data);
+          console.log('[ChatPanel] Admin SSE:', data);
+          
+          if (data.type === 'agent_request') {
+            // إضافة إشعار جديد
+            setNotifications(prev => {
+              if (prev.some(n => n.timestamp === data.data.timestamp)) {
+                return prev;
+              }
+              return [...prev, data.data];
+            });
+          }
+          
+          if (data.type === 'conversation_update') {
+            fetchConversations();
+          }
+        } catch (e) {
+          console.error('[ChatPanel] SSE parse error:', e);
+        }
+      };
+      
+      eventSource.onerror = () => {
+        eventSource.close();
+      };
+    };
+    
+    connectAdminSSE();
+    
     fetchConversations();
-    const interval = setInterval(fetchConversations, 5000); // تقليل التكرار
-    return () => clearInterval(interval);
+    const interval = setInterval(fetchConversations, 10000); // تقليل التكرار
+    return () => {
+      eventSource?.close();
+      clearInterval(interval);
+    };
   }, [isOpen]);
 
-  // تحديث الرسائل عند اختيار محادثة
+  // SSE للرسائل عند اختيار محادثة
   useEffect(() => {
     if (!selectedConversation) return;
     
@@ -176,12 +218,47 @@ export function ChatPanel({ isOpen, onClose, isAdminConnected }: ChatPanelProps)
     
     fetchMessages(conversationId);
     fetchConversation(conversationId);
-    const interval = setInterval(() => {
-      // التحقق أن المحادثة ما زالت محددة
-      fetchMessages(conversationId);
-      fetchConversation(conversationId);
-    }, 5000); // تقليل التكرار
-    return () => clearInterval(interval);
+    
+    let eventSource: EventSource;
+    
+    const connectMessagesSSE = () => {
+      eventSource = new EventSource(`/api/conversations/${conversationId}/stream`);
+      
+      eventSource.onmessage = (event) => {
+        try {
+          const data = JSON.parse(event.data);
+          console.log('[ChatPanel] Message SSE:', data);
+          
+          if (data.type === 'new_message') {
+            setMessages(prev => {
+              if (prev.some(m => m.content === data.content && m.senderType === data.senderType)) {
+                return prev;
+              }
+              return [...prev, {
+                id: Date.now(),
+                senderType: data.senderType,
+                senderId: data.senderId || null,
+                content: data.content,
+                createdAt: new Date().toISOString(),
+                isRead: true
+              }];
+            });
+          }
+        } catch (e) {
+          console.error('[ChatPanel] SSE parse error:', e);
+        }
+      };
+      
+      eventSource.onerror = () => {
+        eventSource.close();
+      };
+    };
+    
+    connectMessagesSSE();
+    
+    return () => {
+      eventSource?.close();
+    };
   }, [selectedConversation?.id]);
 
   // تمرير للرسائل الجديدة
@@ -247,8 +324,16 @@ export function ChatPanel({ isOpen, onClose, isAdminConnected }: ChatPanelProps)
       const data = await res.json();
       
       if (data.success) {
-        setMessages(prev => [...prev, data.data]);
+        // إضافة الرسالة محلياً للمدير
+        setMessages(prev => [...prev, {
+          ...data.data,
+          id: Date.now(),
+          createdAt: new Date().toISOString()
+        }]);
         setNewMessage('');
+        
+        // إشعار العميل بالرسالة (عبر SSE في الـ API)
+        // لا حاجة لفعل شيء هنا لأن SSE سيوصل الرسالة للعميل
       }
     } catch (error) {
       console.error('Error sending message:', error);

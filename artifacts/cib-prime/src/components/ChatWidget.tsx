@@ -94,17 +94,65 @@ export function ChatWidget() {
     }
   };
 
-  // تحديث الرسائل كل 3 ثواني
+  // SSE للمحادثات (تحديث فوري)
   useEffect(() => {
     if (!conversation) return;
     
-    const interval = setInterval(() => {
-      fetchMessages(conversation.id);
-      // تحديث حالة online للعميل
-      fetch(`/api/conversations/${conversation.id}/ping`, { method: 'PATCH' });
-    }, 3000);
-
-    return () => clearInterval(interval);
+    let eventSource: EventSource;
+    let retryCount = 0;
+    const maxRetries = 5;
+    
+    const connectSSE = () => {
+      eventSource = new EventSource(`/api/conversations/${conversation.id}/stream`);
+      
+      eventSource.onmessage = (event) => {
+        try {
+          const data = JSON.parse(event.data);
+          console.log('[ChatWidget] SSE message received:', data);
+          
+          // إضافة الرسالة الجديدة للرسائل
+          if (data.type === 'new_message') {
+            setMessages(prev => {
+              // تجنب التكرار
+              if (prev.some(m => m.content === data.content && m.senderType === data.senderType)) {
+                return prev;
+              }
+              return [...prev, {
+                id: Date.now(),
+                senderType: data.senderType,
+                senderId: data.senderId || null,
+                content: data.content,
+                createdAt: new Date().toISOString(),
+                isRead: true
+              }];
+            });
+          }
+        } catch (e) {
+          console.error('[ChatWidget] SSE parse error:', e);
+        }
+      };
+      
+      eventSource.onerror = () => {
+        console.log('[ChatWidget] SSE error, retrying...');
+        eventSource.close();
+        retryCount++;
+        if (retryCount < maxRetries) {
+          setTimeout(connectSSE, 2000);
+        }
+      };
+    };
+    
+    connectSSE();
+    
+    // Ping دوري للحفاظ على الاتصال
+    const pingInterval = setInterval(() => {
+      fetch(`/api/conversations/${conversation.id}/ping`, { method: 'PATCH' }).catch(() => {});
+    }, 30000);
+    
+    return () => {
+      eventSource?.close();
+      clearInterval(pingInterval);
+    };
   }, [conversation]);
 
   // تمرير للرسائل الجديدة
