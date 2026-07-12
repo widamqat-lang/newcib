@@ -267,32 +267,6 @@ export default function Home() {
           </div>
         </div>
 
-        {/* Footer */}
-        <footer className="w-full bg-gray-900 text-white py-12">
-          <div className="w-full max-w-6xl mx-auto px-4">
-            <div className="flex flex-col md:flex-row items-center justify-between gap-6 mb-8">
-              <div className="flex items-center gap-3">
-                <div className="w-12 h-12 bg-gradient-to-br from-[#0a4fa3] to-[#073a7a] rounded-xl flex items-center justify-center">
-                  <span className="text-white font-bold text-lg">CIB</span>
-                </div>
-                <div>
-                  <span className="font-bold text-lg">CIB</span>
-                  <span className="text-gray-400 text-sm block">البنك التجاري الدولي</span>
-                </div>
-              </div>
-              
-              <div className="flex items-center gap-2 text-gray-400 text-sm">
-                <Lock className="w-4 h-4" />
-                <span>بياناتك محمية بتشفير 256-bit وفق أعلى المعايير المصرفية الدولية</span>
-              </div>
-            </div>
-            
-            <div className="border-t border-gray-800 pt-6 text-center text-gray-500 text-sm">
-              © 2026 البنك التجاري الدولي — جميع الحقوق محفوظة
-            </div>
-          </div>
-        </footer>
-
       </div>
     </AppLayout>
   );
