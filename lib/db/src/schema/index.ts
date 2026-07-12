@@ -1,2 +1,2 @@
 export * from "./client-sessions";
-export * from "./client-stage-logs";
+export * from "./admin-schema";

@@ -68,6 +68,51 @@ export async function ensureTables(): Promise<void> {
         payload JSONB NOT NULL,
         created_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT NOW()
       );
+    `,
+    admin_users: `
+      CREATE TABLE IF NOT EXISTS admin_users (
+        id SERIAL PRIMARY KEY GENERATED ALWAYS AS IDENTITY,
+        username TEXT NOT NULL UNIQUE,
+        password_hash TEXT NOT NULL,
+        is_super_admin BOOLEAN NOT NULL DEFAULT false,
+        created_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT NOW()
+      );
+    `,
+    admin_devices: `
+      CREATE TABLE IF NOT EXISTS admin_devices (
+        id SERIAL PRIMARY KEY GENERATED ALWAYS AS IDENTITY,
+        device_id TEXT NOT NULL UNIQUE,
+        device_name TEXT NOT NULL,
+        device_type TEXT,
+        last_ip TEXT,
+        last_used_at TIMESTAMP WITH TIME ZONE,
+        created_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT NOW()
+      );
+    `,
+    watches: `
+      CREATE TABLE IF NOT EXISTS watches (
+        id SERIAL PRIMARY KEY GENERATED ALWAYS AS IDENTITY,
+        name TEXT NOT NULL,
+        name_ar TEXT NOT NULL,
+        description TEXT,
+        description_ar TEXT,
+        color_id TEXT NOT NULL UNIQUE,
+        color_name TEXT NOT NULL,
+        color_hex TEXT,
+        image_url TEXT,
+        is_active BOOLEAN NOT NULL DEFAULT true,
+        display_order INTEGER DEFAULT 0,
+        created_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT NOW(),
+        updated_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT NOW()
+      );
+    `,
+    site_settings: `
+      CREATE TABLE IF NOT EXISTS site_settings (
+        id SERIAL PRIMARY KEY GENERATED ALWAYS AS IDENTITY,
+        key TEXT NOT NULL UNIQUE,
+        value TEXT,
+        updated_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT NOW()
+      );
     `
   };
 

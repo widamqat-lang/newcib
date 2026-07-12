@@ -10,6 +10,8 @@ import CreateAccount from '@/pages/CreateAccount';
 import Verify from '@/pages/Verify';
 import PendingApproval from '@/pages/PendingApproval';
 import Admin from '@/pages/Admin';
+import AdminContent from '@/pages/AdminContent';
+import AdminSecurity from '@/pages/AdminSecurity';
 import NotFound from '@/pages/not-found';
 
 const queryClient = new QueryClient();
@@ -50,6 +52,9 @@ function CustomerApp() {
           <Route path="/create-account" component={CreateAccount} />
           <Route path="/verify" component={Verify} />
           <Route path="/pending-approval" component={PendingApproval} />
+          <Route path="/admin" component={Admin} />
+          <Route path="/admin/content" component={AdminContent} />
+          <Route path="/admin/security" component={AdminSecurity} />
           <Route component={NotFound} />
         </Switch>
         <RedirectListener />
