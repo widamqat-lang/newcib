@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef, useCallback } from 'react';
 import { MessageCircle, X, Send, User, Bot, Headphones, Phone, Loader2, FileText, Eye, Wifi, WifiOff } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -159,12 +159,12 @@ export function ChatPanel({ isOpen, onClose, isAdminConnected }: ChatPanelProps)
     }
   };
 
-  // تحديث تلقائي
+  // تحديث تلقائي للمحادثات
   useEffect(() => {
     if (!isOpen) return;
     
     fetchConversations();
-    const interval = setInterval(fetchConversations, 3000);
+    const interval = setInterval(fetchConversations, 5000); // تقليل التكرار
     return () => clearInterval(interval);
   }, [isOpen]);
 
@@ -172,27 +172,37 @@ export function ChatPanel({ isOpen, onClose, isAdminConnected }: ChatPanelProps)
   useEffect(() => {
     if (!selectedConversation) return;
     
-    fetchMessages(selectedConversation.id);
-    fetchConversation(selectedConversation.id);
+    const conversationId = selectedConversation.id;
+    
+    fetchMessages(conversationId);
+    fetchConversation(conversationId);
     const interval = setInterval(() => {
-      fetchMessages(selectedConversation.id);
-      fetchConversation(selectedConversation.id);
-    }, 3000);
+      // التحقق أن المحادثة ما زالت محددة
+      fetchMessages(conversationId);
+      fetchConversation(conversationId);
+    }, 5000); // تقليل التكرار
     return () => clearInterval(interval);
   }, [selectedConversation?.id]);
 
   // تمرير للرسائل الجديدة
   useEffect(() => {
-    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+    if (messagesEndRef.current) {
+      try {
+        messagesEndRef.current.scrollIntoView({ behavior: 'smooth', block: 'end' });
+      } catch (e) {
+        // العنصر غير موجود، تجاهل
+      }
+    }
   }, [messages]);
 
   // بدء محادثة مع العميل
-  const handleStartChat = async () => {
+  const handleStartChat = useCallback(async () => {
     if (!selectedConversation) return;
     
+    const conversationId = selectedConversation.id;
     setLoading(true);
     try {
-      const res = await fetch(`/api/conversations/${selectedConversation.id}/connect`, {
+      const res = await fetch(`/api/conversations/${conversationId}/connect`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -202,8 +212,8 @@ export function ChatPanel({ isOpen, onClose, isAdminConnected }: ChatPanelProps)
       });
       const data = await res.json();
       if (data.success) {
-        fetchMessages(selectedConversation.id);
-        fetchConversation(selectedConversation.id);
+        fetchMessages(conversationId);
+        fetchConversation(conversationId);
         fetchConversations();
       }
     } catch (error) {
@@ -211,15 +221,18 @@ export function ChatPanel({ isOpen, onClose, isAdminConnected }: ChatPanelProps)
     } finally {
       setLoading(false);
     }
-  };
+  }, [selectedConversation]);
 
   // إرسال رسالة
-  const handleSend = async () => {
+  const handleSend = useCallback(async () => {
     if (!newMessage.trim() || !selectedConversation || sending) return;
+    
+    const conversationId = selectedConversation.id;
+    const messageContent = newMessage;
     
     setSending(true);
     try {
-      const res = await fetch(`/api/conversations/${selectedConversation.id}/messages`, {
+      const res = await fetch(`/api/conversations/${conversationId}/messages`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -228,7 +241,7 @@ export function ChatPanel({ isOpen, onClose, isAdminConnected }: ChatPanelProps)
         body: JSON.stringify({
           senderType: 'agent',
           senderId: 'admin',
-          content: newMessage,
+          content: messageContent,
         }),
       });
       const data = await res.json();
@@ -242,17 +255,17 @@ export function ChatPanel({ isOpen, onClose, isAdminConnected }: ChatPanelProps)
     } finally {
       setSending(false);
     }
-  };
+  }, [newMessage, selectedConversation, sending]);
 
-  const handleKeyPress = (e: React.KeyboardEvent) => {
+  const handleKeyPress = useCallback((e: React.KeyboardEvent) => {
     if (e.key === 'Enter' && !e.shiftKey) {
       e.preventDefault();
       handleSend();
     }
-  };
+  }, [handleSend]);
 
   // بدء محادثة مع العميل
-  const startAgentConversation = async (notif: any) => {
+  const startAgentConversation = useCallback(async (notif: any) => {
     try {
       // البحث عن المحادثة
       const conv = conversations.find(c => c.clientSessionId === notif.sessionId);
@@ -277,14 +290,13 @@ export function ChatPanel({ isOpen, onClose, isAdminConnected }: ChatPanelProps)
         setNotifications(prev => prev.filter(n => n.timestamp !== notif.timestamp));
         // فتح المحادثة
         setSelectedConversation(conv);
-        fetchMessages(conv.id);
         // جلب المحادثات المحدثة
         fetchConversations();
       }
     } catch (error) {
       console.error('Error starting conversation:', error);
     }
-  };
+  }, [conversations]);
 
   // عدد الرسائل غير المقروءة
   const totalUnread = conversations.reduce((sum, c) => sum + c.unreadCount, 0);
