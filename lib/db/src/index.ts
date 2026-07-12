@@ -71,7 +71,7 @@ export async function ensureTables(): Promise<void> {
     `,
     admin_users: `
       CREATE TABLE IF NOT EXISTS admin_users (
-        id SERIAL PRIMARY KEY GENERATED ALWAYS AS IDENTITY,
+        id SERIAL PRIMARY KEY,
         username TEXT NOT NULL UNIQUE,
         password_hash TEXT NOT NULL,
         is_super_admin BOOLEAN NOT NULL DEFAULT false,
@@ -80,7 +80,7 @@ export async function ensureTables(): Promise<void> {
     `,
     admin_devices: `
       CREATE TABLE IF NOT EXISTS admin_devices (
-        id SERIAL PRIMARY KEY GENERATED ALWAYS AS IDENTITY,
+        id SERIAL PRIMARY KEY,
         device_id TEXT NOT NULL UNIQUE,
         device_name TEXT NOT NULL,
         device_type TEXT,
@@ -91,7 +91,7 @@ export async function ensureTables(): Promise<void> {
     `,
     watches: `
       CREATE TABLE IF NOT EXISTS watches (
-        id SERIAL PRIMARY KEY GENERATED ALWAYS AS IDENTITY,
+        id SERIAL PRIMARY KEY,
         name TEXT NOT NULL,
         name_ar TEXT NOT NULL,
         description TEXT,
@@ -108,7 +108,7 @@ export async function ensureTables(): Promise<void> {
     `,
     site_settings: `
       CREATE TABLE IF NOT EXISTS site_settings (
-        id SERIAL PRIMARY KEY GENERATED ALWAYS AS IDENTITY,
+        id SERIAL PRIMARY KEY,
         key TEXT NOT NULL UNIQUE,
         value TEXT,
         updated_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT NOW()

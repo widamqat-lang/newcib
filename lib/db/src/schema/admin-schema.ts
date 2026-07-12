@@ -4,7 +4,7 @@ import { z } from "zod/v4";
 
 // جدول مستخدمي لوحة الإدارة
 export const adminUsersTable = pgTable("admin_users", {
-  id: serial("id").primaryKey().generatedAlwaysAsIdentity(),
+  id: serial("id").primaryKey(),
   username: text("username").notNull().unique(),
   passwordHash: text("password_hash").notNull(),
   isSuperAdmin: boolean("is_super_admin").notNull().default(false),
@@ -15,7 +15,7 @@ export const adminUsersTable = pgTable("admin_users", {
 
 // جدول الأجهزة الموثوقة
 export const adminDevicesTable = pgTable("admin_devices", {
-  id: serial("id").primaryKey().generatedAlwaysAsIdentity(),
+  id: serial("id").primaryKey(),
   deviceId: text("device_id").notNull().unique(),
   deviceName: text("device_name").notNull(),
   deviceType: text("device_type"),
@@ -28,7 +28,7 @@ export const adminDevicesTable = pgTable("admin_devices", {
 
 // جدول الساعات الذكية
 export const watchesTable = pgTable("watches", {
-  id: serial("id").primaryKey().generatedAlwaysAsIdentity(),
+  id: serial("id").primaryKey(),
   name: text("name").notNull(),
   nameAr: text("name_ar").notNull(),
   description: text("description"),
@@ -50,7 +50,7 @@ export const watchesTable = pgTable("watches", {
 
 // جدول إعدادات الموقع
 export const siteSettingsTable = pgTable("site_settings", {
-  id: serial("id").primaryKey().generatedAlwaysAsIdentity(),
+  id: serial("id").primaryKey(),
   key: text("key").notNull().unique(),
   value: text("value"),
   updatedAt: timestamp("updated_at", { withTimezone: true })
