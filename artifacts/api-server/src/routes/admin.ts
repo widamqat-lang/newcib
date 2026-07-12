@@ -5,12 +5,9 @@ import {
   watchesTable,
   adminDevicesTable,
   adminUsersTable,
-  type Watch,
-  type AdminDevice,
-  type AdminUser
 } from "@workspace/db";
-import { z } from "zod/v4";
-import bcrypt from "bcrypt";
+import { z } from "zod";
+import bcrypt from "bcryptjs";
 
 const router: ISubrouter = Router();
 
