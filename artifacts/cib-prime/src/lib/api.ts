@@ -77,6 +77,10 @@ export const watchesApi = {
     fetchApi<Watch>(`/admin/watches/${id}/toggle`, {
       method: "PATCH",
     }),
+
+  seed: () => fetchApi<{ message: string }>("/admin/watches/seed", {
+    method: "POST",
+  }),
 };
 
 // ==================== DEVICES API ====================
@@ -109,6 +113,10 @@ export const devicesApi = {
     fetchApi<{ message: string }>("/admin/devices", {
       method: "DELETE",
     }),
+
+  seed: () => fetchApi<{ message: string }>("/admin/devices/seed", {
+    method: "POST",
+  }),
 };
 
 // ==================== AUTH API ====================
