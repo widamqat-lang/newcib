@@ -1,5 +1,4 @@
 import { drizzle } from "drizzle-orm/node-postgres";
-import { sql } from "drizzle-orm";
 import pg from "pg";
 import * as schema from "./schema";
 
@@ -11,13 +10,25 @@ if (!process.env.DATABASE_URL) {
   );
 }
 
-// Optimize connection pool for serverless
+// Optimize connection pool for serverless (Neon PostgreSQL)
 export const pool = new Pool({ 
   connectionString: process.env.DATABASE_URL,
-  max: 10,
-  idleTimeoutMillis: 30000,
-  connectionTimeoutMillis: 5000, // 5 second connection timeout
+  // Neon recommends these settings for serverless
+  max: 5,  // Reduced for serverless environments
+  idleTimeoutMillis: 10000,  // 10 seconds (Neon terminates idle connections after ~5 min)
+  connectionTimeoutMillis: 10000,  // 10 second connection timeout
+  statement_timeout: 15000,  // 15 second query timeout
 });
+
+// Log pool events for debugging
+pool.on('error', (err) => {
+  console.error('❌ Unexpected pool error:', err.message);
+});
+
+pool.on('connect', () => {
+  console.log('🔌 New database connection established');
+});
+
 export const db = drizzle(pool, { schema });
 
 export * from "./schema";

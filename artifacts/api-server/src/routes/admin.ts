@@ -14,6 +14,18 @@ import {
 import { z } from "zod";
 import bcrypt from "bcryptjs";
 
+// Request timeout middleware to prevent hanging requests
+const REQUEST_TIMEOUT_MS = 15000; // 15 seconds
+
+function withTimeout<T>(promise: Promise<T>, timeoutMs: number): Promise<T> {
+  return Promise.race([
+    promise,
+    new Promise<T>((_, reject) => 
+      setTimeout(() => reject(new Error(`Request timeout after ${timeoutMs}ms`)), timeoutMs)
+    )
+  ]);
+}
+
 // Configure multer for image uploads
 const uploadsDir = path.join(process.cwd(), "uploads");
 if (!fs.existsSync(uploadsDir)) {
@@ -109,26 +121,31 @@ router.get("/watches", async (req, res) => {
   console.log("🔍 [WATCHES] Fetching all watches...");
   try {
     console.log("✅ [WATCHES] Connected to database, executing query...");
-    const result = await db.select().from(watchesTable);
+    const result = await withTimeout(db.select().from(watchesTable), REQUEST_TIMEOUT_MS);
     console.log(`✅ [WATCHES] Query executed, found ${result.length} watches`);
-    console.log("📦 [WATCHES] Data:", JSON.stringify(result, null, 2));
     res.json({ success: true, data: result });
   } catch (error: any) {
     console.error("❌ [WATCHES] Error:", error.message || error);
-    console.error("❌ [WATCHES] Error stack:", error.stack);
     res.status(500).json({ success: false, error: "فشل في جلب الساعات" });
   }
 });
 
 router.get("/watches/:id", async (req, res) => {
   try {
-    const [watch] = await db.select().from(watchesTable).where(eq(watchesTable.id, parseInt(req.params.id)));
+    const id = parseInt(req.params.id);
+    if (isNaN(id)) {
+      return res.status(400).json({ success: false, error: "معرف الساعة غير صالح" });
+    }
+    const [watch] = await withTimeout(
+      db.select().from(watchesTable).where(eq(watchesTable.id, id)),
+      REQUEST_TIMEOUT_MS
+    );
     if (!watch) {
       return res.status(404).json({ success: false, error: "الساعة غير موجودة" });
     }
     res.json({ success: true, data: watch });
-  } catch (error) {
-    console.error("Error fetching watch:", error);
+  } catch (error: any) {
+    console.error("Error fetching watch:", error.message || error);
     res.status(500).json({ success: false, error: "فشل في جلب الساعة" });
   }
 });
@@ -233,13 +250,11 @@ router.get("/devices", async (req, res) => {
   console.log("🔍 [DEVICES] Fetching all devices...");
   try {
     console.log("✅ [DEVICES] Connected to database, executing query...");
-    const result = await db.select().from(adminDevicesTable);
+    const result = await withTimeout(db.select().from(adminDevicesTable), REQUEST_TIMEOUT_MS);
     console.log(`✅ [DEVICES] Query executed, found ${result.length} devices`);
-    console.log("📦 [DEVICES] Data:", JSON.stringify(result, null, 2));
     res.json({ success: true, data: result });
   } catch (error: any) {
     console.error("❌ [DEVICES] Error:", error.message || error);
-    console.error("❌ [DEVICES] Error stack:", error.stack);
     res.status(500).json({ success: false, error: "فشل في جلب الأجهزة" });
   }
 });

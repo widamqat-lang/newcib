@@ -1,5 +1,8 @@
 const API_BASE = "/api";
 
+// Request timeout in milliseconds
+const FETCH_TIMEOUT_MS = 15000;
+
 interface ApiResponse<T> {
   success: boolean;
   data?: T;
@@ -11,23 +14,36 @@ async function fetchApi<T>(
   endpoint: string,
   options: RequestInit = {}
 ): Promise<ApiResponse<T>> {
+  const controller = new AbortController();
+  const timeoutId = setTimeout(() => controller.abort(), FETCH_TIMEOUT_MS);
+
   try {
     const response = await fetch(`${API_BASE}${endpoint}`, {
       ...options,
+      signal: controller.signal,
       headers: {
         "Content-Type": "application/json",
         ...options.headers,
       },
     });
 
-    const data = await response.json();
+    clearTimeout(timeoutId);
 
     if (!response.ok) {
-      return { success: false, error: data.error || "حدث خطأ غير متوقع" };
+      const data = await response.json().catch(() => ({}));
+      return { success: false, error: data.error || `خطأ HTTP: ${response.status}` };
     }
 
+    const data = await response.json();
     return { success: true, ...data };
-  } catch (error) {
+  } catch (error: any) {
+    clearTimeout(timeoutId);
+    
+    if (error.name === 'AbortError') {
+      console.error("API Error: Request timeout");
+      return { success: false, error: "انتهت مهلة الطلب - يرجى المحاولة مرة أخرى" };
+    }
+    
     console.error("API Error:", error);
     return { success: false, error: "فشل في الاتصال بالخادم" };
   }

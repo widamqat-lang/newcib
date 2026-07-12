@@ -18,9 +18,15 @@ if (Number.isNaN(port) || port <= 0) {
 }
 
 async function start() {
+  console.log("🚀 Starting CIB Prime API Server...");
+  console.log(`📍 Port: ${port}`);
+  console.log(`🔧 Environment: ${process.env.NODE_ENV || 'development'}`);
+  
   try {
     // Initialize database and run automatic migrations
+    console.log("🗄️ Initializing database connection...");
     await initializeDatabase();
+    console.log("✅ Database initialized successfully");
     
     // Seed default data with individual error handling
     try {
@@ -29,6 +35,7 @@ async function start() {
       const bcrypt = await import("bcryptjs");
       
       // Check and create admin user
+      console.log("👤 Checking admin user...");
       const existingAdmin = await db.select().from(adminUsersTable).limit(1);
       if (existingAdmin.length === 0) {
         const hashedPassword = await bcrypt.hash("admin123", 10);
@@ -43,6 +50,7 @@ async function start() {
       }
       
       // Check and seed watches
+      console.log("⌚ Checking watches...");
       const existingWatches = await db.select().from(watchesTable).limit(1);
       if (existingWatches.length === 0) {
         const defaultWatches = [
@@ -59,6 +67,7 @@ async function start() {
       }
       
       // Check and seed devices
+      console.log("📱 Checking devices...");
       const existingDevices = await db.select().from(adminDevicesTable).limit(1);
       if (existingDevices.length === 0) {
         const defaultDevices = [
@@ -75,6 +84,7 @@ async function start() {
       console.error("⚠️ Seed error (continuing anyway):", seedError);
     }
     
+    console.log("🌐 Starting HTTP server...");
     const server = app.listen(port, (err) => {
       if (err) {
         logger.error({ err }, "Error listening on port");
@@ -82,13 +92,30 @@ async function start() {
       }
 
       logger.info({ port }, "Server listening");
+      console.log(`✅ Server is running on port ${port}`);
+      console.log(`📡 Health check: http://localhost:${port}/api/healthz`);
     });
 
+    // Setup WebSocket for real-time communication
+    console.log("🔌 Setting up WebSocket...");
     setupRealtime(server);
+    console.log("✅ WebSocket server ready");
+    
   } catch (error) {
     logger.error({ error }, "Failed to start server");
+    console.error("❌ Failed to start server:", error);
     process.exit(1);
   }
 }
+
+// Handle uncaught exceptions
+process.on('uncaughtException', (error) => {
+  console.error("❌ Uncaught Exception:", error);
+  process.exit(1);
+});
+
+process.on('unhandledRejection', (reason, promise) => {
+  console.error("❌ Unhandled Rejection at:", promise, "reason:", reason);
+});
 
 start();
