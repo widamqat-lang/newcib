@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Link, useLocation, useNavigate } from 'wouter';
+import { Link, useLocation } from 'wouter';
 import { 
   Shield, 
   Users, 
@@ -24,7 +24,6 @@ const navItems = [
 
 export function AdminLayout({ children }: AdminLayoutProps) {
   const [location] = useLocation();
-  const navigate = useNavigate();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
   const isActive = (href: string, exact?: boolean) => {
@@ -34,7 +33,7 @@ export function AdminLayout({ children }: AdminLayoutProps) {
 
   const handleNavClick = (href: string) => {
     setMobileMenuOpen(false);
-    navigate(href);
+    window.location.href = href;
   };
 
   return (
