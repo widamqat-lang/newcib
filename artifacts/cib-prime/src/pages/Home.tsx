@@ -133,20 +133,19 @@ export default function Home() {
             </div>
           </div>
 
-          {/* 🌊 التدرج الانسيابي الموحد (تم إصلاح تفاوت الألوان هنا بالاعتماد على نفس درجة الخلفية الثابتة وبدون شفافية متضاربة) */}
-          <div className="absolute bottom-0 left-0 right-0 w-full overflow-hidden leading-none z-10 pointer-events-none select-none">
-            <div className="w-full h-24 bg-gradient-to-b from-transparent to-[#032249]"></div>
-            <svg 
-              viewBox="0 0 1440 160" 
-              preserveAspectRatio="none" 
-              className="relative block w-full h-[70px] sm:h-[90px] fill-white text-white -mb-[1px]"
-            >
-              <path 
-                d="M0,64 C240,140 480,160 720,105 C960,50 1200,10 1440,75 L1440,160 L0,160 Z" 
-                className="fill-white"
-              ></path>
-            </svg>
-          </div>
+          {/* 🌊 المنحنى السفلي المندمج مباشرة مع الخلفية بدون أي فواصل لونية */}
+<div className="absolute bottom-0 left-0 right-0 w-full overflow-hidden leading-none z-10 pointer-events-none select-none">
+  <svg 
+    viewBox="0 0 1440 160" 
+    preserveAspectRatio="none" 
+    className="relative block w-full h-[70px] sm:h-[90px] fill-white text-white -mb-[1px]"
+  >
+    <path 
+      d="M0,64 C240,140 480,160 720,105 C960,50 1200,10 1440,75 L1440,160 L0,160 Z" 
+      className="fill-white"
+    ></path>
+  </svg>
+</div>
 
         </div>
 
