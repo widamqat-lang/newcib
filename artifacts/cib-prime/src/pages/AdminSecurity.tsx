@@ -3,15 +3,10 @@ import { AdminLayout } from '@/components/layout/AdminLayout';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Lock, Smartphone, Trash2, RefreshCw, Eye, EyeOff, CheckCircle, AlertCircle, Loader2 } from 'lucide-react';
+import { Lock, Smartphone, Trash2, RefreshCw, Eye, EyeOff, CheckCircle, AlertCircle, WifiOff } from 'lucide-react';
 import { devicesApi, authApi, type Device } from '@/lib/api';
 
-// بيانات تجريبية للأجهزة
-const defaultDevices: Device[] = [
-  { id: 1, deviceId: 'device-1', deviceName: 'iPhone 15 Pro', deviceType: 'mobile', lastIp: '192.168.1.100', lastUsedAt: new Date('2026-07-12T10:30:00'), createdAt: new Date() },
-  { id: 2, deviceId: 'device-2', deviceName: 'MacBook Pro', deviceType: 'desktop', lastIp: '192.168.1.101', lastUsedAt: new Date('2026-07-12T08:15:00'), createdAt: new Date() },
-  { id: 3, deviceId: 'device-3', deviceName: 'Samsung Galaxy S24', deviceType: 'mobile', lastIp: '192.168.1.102', lastUsedAt: new Date('2026-07-11T22:45:00'), createdAt: new Date() },
-];
+type LoadingState = 'loading' | 'success' | 'error' | 'empty';
 
 function formatDate(dateStr: string | Date | undefined): string {
   if (!dateStr) return 'غير معروف';
@@ -27,7 +22,8 @@ function formatDate(dateStr: string | Date | undefined): string {
 
 export default function AdminSecurity() {
   const [devices, setDevices] = useState<Device[]>([]);
-  const [loadingDevices, setLoadingDevices] = useState(true);
+  const [state, setState] = useState<LoadingState>('loading');
+  const [errorMessage, setErrorMessage] = useState('');
   const [currentPassword, setCurrentPassword] = useState('');
   const [newPassword, setNewPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
@@ -35,38 +31,60 @@ export default function AdminSecurity() {
   const [isChangingPassword, setIsChangingPassword] = useState(false);
   const [passwordError, setPasswordError] = useState('');
   const [passwordSuccess, setPasswordSuccess] = useState('');
-  const [isInitialized, setIsInitialized] = useState(false);
+
+  const fetchDevices = async () => {
+    setState('loading');
+    setErrorMessage('');
+    
+    try {
+      const result = await devicesApi.getAll();
+      
+      if (result.success) {
+        setDevices(result.data || []);
+        setState((result.data && result.data.length > 0) ? 'success' : 'empty');
+      } else {
+        setErrorMessage(result.error as string || 'فشل في جلب البيانات من الخادم');
+        setState('error');
+      }
+    } catch (error) {
+      console.error('Error fetching devices:', error);
+      setErrorMessage('فشل الاتصال بالخادم. تأكد من اتصالك بالإنترنت.');
+      setState('error');
+    }
+  };
 
   useEffect(() => {
     fetchDevices();
   }, []);
 
-  const fetchDevices = async () => {
-    setLoadingDevices(true);
-    const result = await devicesApi.getAll();
-    if (result.success && result.data && result.data.length > 0) {
-      setDevices(result.data);
-      setIsInitialized(true);
-    } else if (!isInitialized) {
-      // استخدام البيانات التجريبية إذا لم تكن هناك بيانات
-      setDevices(defaultDevices);
-    }
-    setLoadingDevices(false);
-  };
-
   const handleDeleteDevice = async (id: number) => {
     if (!confirm('هل أنت متأكد من حذف هذا الجهاز؟')) return;
-    const result = await devicesApi.delete(id);
-    if (result.success) {
-      await fetchDevices();
+    
+    try {
+      const result = await devicesApi.delete(id);
+      if (result.success) {
+        await fetchDevices();
+      } else {
+        alert(result.error || 'فشل في حذف الجهاز');
+      }
+    } catch (error) {
+      alert('فشل في الاتصال بالخادم');
     }
   };
 
   const handleLogoutAll = async () => {
     if (!confirm('هل أنت متأكد من تسجيل الخروج من جميع الأجهزة؟')) return;
-    const result = await devicesApi.deleteAll();
-    if (result.success) {
-      setDevices([]);
+    
+    try {
+      const result = await devicesApi.deleteAll();
+      if (result.success) {
+        setDevices([]);
+        setState('empty');
+      } else {
+        alert(result.error || 'فشل في تسجيل الخروج');
+      }
+    } catch (error) {
+      alert('فشل في الاتصال بالخادم');
     }
   };
 
@@ -90,15 +108,21 @@ export default function AdminSecurity() {
     }
 
     setIsChangingPassword(true);
-    const result = await authApi.changePassword(currentPassword, newPassword);
+    
+    try {
+      const result = await authApi.changePassword(currentPassword, newPassword);
 
-    if (result.success) {
-      setPasswordSuccess(result.message || 'تم تغيير كلمة المرور بنجاح');
-      setCurrentPassword('');
-      setNewPassword('');
-      setConfirmPassword('');
-    } else {
-      setPasswordError(result.error as string || 'فشل في تغيير كلمة المرور');
+      if (result.success) {
+        setPasswordSuccess(result.message || 'تم تغيير كلمة المرور بنجاح');
+        setCurrentPassword('');
+        setNewPassword('');
+        setConfirmPassword('');
+      } else {
+        setPasswordError(result.error as string || 'فشل في تغيير كلمة المرور');
+      }
+    } catch (error) {
+      console.error('Password change error:', error);
+      setPasswordError('فشل الاتصال بالخادم. تأكد من اتصالك بالإنترنت.');
     }
 
     setIsChangingPassword(false);
@@ -173,15 +197,15 @@ export default function AdminSecurity() {
               </Button>
 
               {passwordError && (
-                <div className="flex items-center gap-2 text-red-500 text-sm">
-                  <AlertCircle className="w-4 h-4" />
+                <div className="bg-red-50 border border-red-200 rounded-lg p-3 flex items-center gap-2 text-red-600 text-sm">
+                  <AlertCircle className="w-4 h-4 shrink-0" />
                   <span>{passwordError}</span>
                 </div>
               )}
 
               {passwordSuccess && (
-                <div className="flex items-center gap-2 text-green-600 text-sm">
-                  <CheckCircle className="w-4 h-4" />
+                <div className="bg-green-50 border border-green-200 rounded-lg p-3 flex items-center gap-2 text-green-600 text-sm">
+                  <CheckCircle className="w-4 h-4 shrink-0" />
                   <span>{passwordSuccess}</span>
                 </div>
               )}
@@ -192,7 +216,10 @@ export default function AdminSecurity() {
                 className="w-full md:w-auto bg-[#0a4fa3] hover:bg-[#073a7a]"
               >
                 {isChangingPassword ? (
-                  <><Loader2 className="w-4 h-4 animate-spin ml-2" /> جارٍ التغيير...</>
+                  <>
+                    <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin ml-2"></div>
+                    جارٍ التغيير...
+                  </>
                 ) : (
                   'تغيير كلمة المرور'
                 )}
@@ -214,7 +241,7 @@ export default function AdminSecurity() {
                   <CardDescription>الأجهزة المسجلة للمصادقة الثنائية</CardDescription>
                 </div>
               </div>
-              {devices.length > 0 && (
+              {state === 'success' && devices.length > 0 && (
                 <Button
                   variant="outline"
                   size="sm"
@@ -228,17 +255,42 @@ export default function AdminSecurity() {
             </div>
           </CardHeader>
           <CardContent>
-            {loadingDevices ? (
-              <div className="flex items-center justify-center py-8">
-                <Loader2 className="w-6 h-6 animate-spin text-primary" />
+            {/* Loading State */}
+            {state === 'loading' && (
+              <div className="py-12 text-center">
+                <div className="w-10 h-10 border-4 border-primary/30 border-t-primary rounded-full animate-spin mx-auto mb-3"></div>
+                <p className="text-muted-foreground text-sm">جارٍ جلب الأجهزة...</p>
               </div>
-            ) : devices.length === 0 ? (
-              <div className="text-center py-8 text-muted-foreground">
-                <Smartphone className="w-12 h-12 mx-auto mb-3 opacity-50" />
-                <p>لا توجد أجهزة موثوقة</p>
-                <p className="text-sm">ستظهر الأجهزة هنا عند تسجيل الدخول</p>
+            )}
+
+            {/* Error State */}
+            {state === 'error' && (
+              <div className="py-8 text-center">
+                <div className="w-12 h-12 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-3">
+                  <WifiOff className="w-6 h-6 text-red-500" />
+                </div>
+                <h3 className="text-sm font-bold text-red-600 mb-1">فشل في جلب الأجهزة</h3>
+                <p className="text-xs text-red-500/80 mb-3">{errorMessage}</p>
+                <Button onClick={fetchDevices} size="sm" className="gap-2 bg-red-500 hover:bg-red-600">
+                  <RefreshCw className="w-3 h-3" />
+                  إعادة المحاولة
+                </Button>
               </div>
-            ) : (
+            )}
+
+            {/* Empty State */}
+            {state === 'empty' && (
+              <div className="py-8 text-center">
+                <div className="w-12 h-12 bg-muted rounded-full flex items-center justify-center mx-auto mb-3">
+                  <Smartphone className="w-6 h-6 text-muted-foreground" />
+                </div>
+                <p className="text-sm text-muted-foreground">لا توجد أجهزة موثوقة</p>
+                <p className="text-xs text-muted-foreground/70 mt-1">ستظهر الأجهزة هنا عند تسجيل الدخول</p>
+              </div>
+            )}
+
+            {/* Devices List */}
+            {state === 'success' && devices.length > 0 && (
               <div className="space-y-3">
                 {devices.map((device) => (
                   <div
