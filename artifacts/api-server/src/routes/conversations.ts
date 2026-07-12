@@ -3,8 +3,35 @@ import { eq, desc, and, sql } from "drizzle-orm";
 import { db, conversationsTable, messagesTable, clientSessionsTable, conversationSummariesTable } from "@workspace/db";
 import { LocalAI } from "../lib/localAI";
 import { notifyAdminsOfAgentRequest } from "../lib/realtime";
+import { sessions, SESSION_DURATION_HOURS } from "../lib/sessions";
 
 const router = Router();
+
+// Middleware للتحقق من تسجيل دخول المدير
+async function requireAdminAuth(req: any, res: any, next: any) {
+  const authHeader = req.headers.authorization;
+  
+  if (!authHeader || !authHeader.startsWith("Bearer ")) {
+    return res.status(401).json({ success: false, error: "غير مصرح - يلزم تسجيل الدخول" });
+  }
+  
+  const token = authHeader.substring(7);
+  const session = sessions.get(token);
+  
+  if (!session) {
+    return res.status(401).json({ success: false, error: "جلسة غير صالحة" });
+  }
+  
+  // Check session expiry
+  const now = new Date();
+  const expiry = new Date(session.createdAt.getTime() + SESSION_DURATION_HOURS * 60 * 60 * 1000);
+  if (now > expiry) {
+    sessions.delete(token);
+    return res.status(401).json({ success: false, error: "انتهت الجلسة" });
+  }
+  
+  next();
+}
 
 // ============================================
 // REST API للمحادثات
@@ -74,8 +101,8 @@ router.post("/", async (req, res) => {
   }
 });
 
-// جلب جميع المحادثات (للموظف)
-router.get("/", async (_req, res) => {
+// جلب جميع المحادثات (للموظف) - يتطلب auth
+router.get("/", requireAdminAuth, async (_req, res) => {
   try {
     const conversations = await db
       .select()
@@ -116,8 +143,8 @@ router.get("/", async (_req, res) => {
   }
 });
 
-// جلب محادثة محددة
-router.get("/:id", async (req, res) => {
+// جلب محادثة محددة - يتطلب auth
+router.get("/:id", requireAdminAuth, async (req, res) => {
   try {
     const { id } = req.params;
     const conversationId = parseInt(id);
@@ -155,8 +182,8 @@ router.get("/:id", async (req, res) => {
   }
 });
 
-// جلب رسائل محادثة محددة
-router.get("/:id/messages", async (req, res) => {
+// جلب رسائل محادثة محددة - يتطلب auth للمدير
+router.get("/:id/messages", requireAdminAuth, async (req, res) => {
   try {
     const { id } = req.params;
     const conversationId = parseInt(id);
@@ -174,7 +201,7 @@ router.get("/:id/messages", async (req, res) => {
   }
 });
 
-// إرسال رسالة جديدة
+// إرسال رسالة جديدة (للعميل بدون auth، للمدير مع auth)
 router.post("/:id/messages", async (req, res) => {
   try {
     const { id } = req.params;
@@ -431,8 +458,8 @@ router.post("/:id/contact", async (req, res) => {
   }
 });
 
-// بدء المحادثة من قبل الموظف
-router.post("/:id/connect", async (req, res) => {
+// بدء المحادثة من قبل الموظف - يتطلب auth
+router.post("/:id/connect", requireAdminAuth, async (req, res) => {
   try {
     const { id } = req.params;
     const { agentId } = req.body;
@@ -496,8 +523,8 @@ router.patch("/:id/ping", async (req, res) => {
   }
 });
 
-// جلب آخر الرسائل (للـ polling)
-router.get("/:id/messages/latest", async (req, res) => {
+// جلب آخر الرسائل (للـ polling) - يتطلب auth للمدير
+router.get("/:id/messages/latest", requireAdminAuth, async (req, res) => {
   try {
     const { id } = req.params;
     const { after } = req.query;

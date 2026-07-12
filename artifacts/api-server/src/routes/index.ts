@@ -9,9 +9,16 @@ import { db, watchesTable } from "@workspace/db";
 
 const router: IRouter = Router();
 
+// Health check يجب أن يكون أولاً
 router.use(healthRouter);
+
+// Admin routes (مع auth)
 router.use("/admin", adminRouter);
+
+// Upload routes
 router.use("/upload", uploadRouter);
+
+// Conversations routes (للإدارة - يتطلب auth)
 router.use("/conversations", conversationsRouter);
 
 // Public watches endpoint for customers

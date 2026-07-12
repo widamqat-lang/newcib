@@ -14,6 +14,7 @@ import {
   blockedDevicesTable,
 } from "@workspace/db";
 import { z } from "zod";
+import { sessions, SESSION_DURATION_HOURS } from "../lib/sessions";
 
 // Configure multer for image uploads
 const uploadsDir = path.join(process.cwd(), "uploads");
@@ -36,10 +37,6 @@ const upload = multer({
   storage,
   limits: { fileSize: 5 * 1024 * 1024 }, // 5MB
 });
-
-// In-memory sessions store (use Redis/DB in production)
-const sessions = new Map<string, { deviceId: string; createdAt: Date }>();
-const SESSION_DURATION_HOURS = 24;
 
 const router: ISubrouter = Router();
 
