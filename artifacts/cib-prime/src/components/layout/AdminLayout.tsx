@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Link, useLocation } from 'wouter';
+import { Link, useLocation, useNavigate } from 'wouter';
 import { 
   Shield, 
   Users, 
@@ -24,11 +24,17 @@ const navItems = [
 
 export function AdminLayout({ children }: AdminLayoutProps) {
   const [location] = useLocation();
+  const navigate = useNavigate();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
   const isActive = (href: string, exact?: boolean) => {
     if (exact) return location === href;
     return location.startsWith(href);
+  };
+
+  const handleNavClick = (href: string) => {
+    setMobileMenuOpen(false);
+    navigate(href);
   };
 
   return (
@@ -103,10 +109,13 @@ export function AdminLayout({ children }: AdminLayoutProps) {
         </nav>
       </header>
 
-      {/* Mobile Navigation */}
+      {/* Mobile Navigation Overlay */}
       {mobileMenuOpen && (
-        <div className="md:hidden fixed inset-0 top-[72px] z-40 bg-black/50 animate-in fade-in duration-200" onClick={() => setMobileMenuOpen(false)}>
-          <nav 
+        <div 
+          className="md:hidden fixed inset-0 top-[72px] z-40 bg-black/50 animate-in fade-in duration-200"
+          onClick={() => setMobileMenuOpen(false)}
+        >
+          <div 
             className="bg-white border-b border-border animate-in slide-in-from-top duration-300"
             onClick={(e) => e.stopPropagation()}
           >
@@ -114,11 +123,11 @@ export function AdminLayout({ children }: AdminLayoutProps) {
               {navItems.map((item) => {
                 const active = isActive(item.href, item.exact);
                 return (
-                  <Link
+                  <button
                     key={item.href}
-                    href={item.href}
-                    onClick={() => setMobileMenuOpen(false)}
-                    className={`flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium transition-all ${
+                    type="button"
+                    onClick={() => handleNavClick(item.href)}
+                    className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium transition-all ${
                       active 
                         ? 'bg-[#0a4fa3] text-white' 
                         : 'text-muted-foreground hover:text-foreground hover:bg-muted'
@@ -127,23 +136,23 @@ export function AdminLayout({ children }: AdminLayoutProps) {
                     <item.icon className="w-5 h-5" />
                     <span>{item.label}</span>
                     <ChevronRight className="w-4 h-4 mr-auto rotate-180" />
-                  </Link>
+                  </button>
                 );
               })}
               
               <div className="border-t border-border pt-4 mt-4">
-                <Link
-                  href="/"
-                  onClick={() => setMobileMenuOpen(false)}
-                  className="flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium text-muted-foreground hover:text-foreground hover:bg-muted"
+                <button
+                  type="button"
+                  onClick={() => handleNavClick('/')}
+                  className="w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium text-muted-foreground hover:text-foreground hover:bg-muted"
                 >
                   <MonitorSmartphone className="w-5 h-5" />
                   <span>العودة للموقع</span>
                   <ChevronRight className="w-4 h-4 mr-auto rotate-180" />
-                </Link>
+                </button>
               </div>
             </div>
-          </nav>
+          </div>
         </div>
       )}
 
