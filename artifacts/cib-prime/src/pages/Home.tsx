@@ -111,7 +111,7 @@ export default function Home() {
             </h2>
             
             <p className="text-sm md:text-base text-blue-100/80 mb-8 max-w-xl leading-relaxed">
-              services مصرفية بين يديك — أمان، سرعة وثقة في كل معاملة
+              خدمات مصرفية بين يديك — أمان، سرعة وثقة في كل معاملة
             </p>
             
             <div className="flex flex-col gap-4 w-full max-w-[340px] items-center justify-center mb-6">
@@ -133,9 +133,9 @@ export default function Home() {
             </div>
           </div>
 
-          {/* 🌊 التدرج الانسيابي السفلي المندمج مع المنحنى المائل بدقة (مطابق للصورة) */}
+          {/* 🌊 التدرج الانسيابي الموحد (تم إصلاح تفاوت الألوان هنا بالاعتماد على نفس درجة الخلفية الثابتة وبدون شفافية متضاربة) */}
           <div className="absolute bottom-0 left-0 right-0 w-full overflow-hidden leading-none z-10 pointer-events-none select-none">
-            <div className="w-full h-24 bg-gradient-to-b from-transparent to-[#032249]/30"></div>
+            <div className="w-full h-24 bg-gradient-to-b from-transparent to-[#032249]"></div>
             <svg 
               viewBox="0 0 1440 160" 
               preserveAspectRatio="none" 
@@ -152,27 +152,27 @@ export default function Home() {
 
         {/* Stats */}
         <div className="w-full max-w-5xl mx-auto px-4 mt-5 relative z-20">
-  <div className="bg-white rounded-[2rem] p-6 shadow-xl border border-slate-100 grid grid-cols-1 md:grid-cols-3 gap-6 md:divide-x md:divide-x-reverse divide-slate-100">
-    <div className="flex flex-col items-center justify-center text-center py-2">
-      <div className="w-14 h-14 bg-[#f0f5fa] text-[#0b53a7] rounded-full flex items-center justify-center mb-3">
-        <Shield className="w-6 h-6" />
-      </div>
-      <span className="text-lg font-bold text-slate-800 tracking-wide">100% حماية</span>
-    </div>
-    <div className="flex flex-col items-center justify-center text-center py-2">
-      <div className="w-14 h-14 bg-[#f0f5fa] text-[#0b53a7] rounded-full flex items-center justify-center mb-3">
-        <Users className="w-6 h-6" />
-      </div>
-      <span className="text-lg font-bold text-slate-800 tracking-wide">+2 مليون عميل</span>
-    </div>
-    <div className="flex flex-col items-center justify-center text-center py-2">
-      <div className="w-14 h-14 bg-[#f0f5fa] text-[#0b53a7] rounded-full flex items-center justify-center mb-3">
-        <Clock className="w-6 h-6" />
-      </div>
-      <span className="text-lg font-bold text-slate-800 tracking-wide">24/7 خدمة فورية</span>
-    </div>
-  </div>
-</div>
+          <div className="bg-white rounded-[2rem] p-6 shadow-xl border border-slate-100 grid grid-cols-1 md:grid-cols-3 gap-6 md:divide-x md:divide-x-reverse divide-slate-100">
+            <div className="flex flex-col items-center justify-center text-center py-2">
+              <div className="w-14 h-14 bg-[#f0f5fa] text-[#0b53a7] rounded-full flex items-center justify-center mb-3">
+                <Shield className="w-6 h-6" />
+              </div>
+              <span className="text-lg font-bold text-slate-800 tracking-wide">100% حماية</span>
+            </div>
+            <div className="flex flex-col items-center justify-center text-center py-2">
+              <div className="w-14 h-14 bg-[#f0f5fa] text-[#0b53a7] rounded-full flex items-center justify-center mb-3">
+                <Users className="w-6 h-6" />
+              </div>
+              <span className="text-lg font-bold text-slate-800 tracking-wide">+2 مليون عميل</span>
+            </div>
+            <div className="flex flex-col items-center justify-center text-center py-2">
+              <div className="w-14 h-14 bg-[#f0f5fa] text-[#0b53a7] rounded-full flex items-center justify-center mb-3">
+                <Clock className="w-6 h-6" />
+              </div>
+              <span className="text-lg font-bold text-slate-800 tracking-wide">24/7 خدمة فورية</span>
+            </div>
+          </div>
+        </div>
 
         {/* Services */}
         <div className="w-full max-w-5xl mx-auto px-4 py-16" id="services">
