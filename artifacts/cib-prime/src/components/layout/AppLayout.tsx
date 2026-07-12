@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { PhoneCall, HelpCircle, Newspaper, ShieldCheck, ArrowUpRight, Menu, X, ChevronDown } from 'lucide-react';
 import { Link } from 'wouter';
+import { ChatWidget } from '@/components/ChatWidget';
 
 export function AppLayout({ children }: { children: React.ReactNode }) {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
@@ -207,6 +208,8 @@ export function AppLayout({ children }: { children: React.ReactNode }) {
 
       {/* 🔒 التذييل الرسمي لحماية البيانات وحقوق البنك */}
       <footer className="w-full bg-card border-t border-card-border py-8 sm:py-10 text-center text-muted-foreground mt-auto">
+        {/* زر خدمة العملاء العائم */}
+        <ChatWidget />
         <div className="max-w-5xl mx-auto px-4 sm:px-6 flex flex-col items-center gap-4">
           
           {/* روابط المصداقية البنكية */}

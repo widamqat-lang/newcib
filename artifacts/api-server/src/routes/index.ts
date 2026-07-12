@@ -2,6 +2,7 @@ import { Router, type IRouter } from "express";
 import healthRouter from "./health";
 import adminRouter from "./admin";
 import uploadRouter from "./upload";
+import conversationsRouter from "./conversations";
 import express from "express";
 import path from "path";
 import { db, watchesTable } from "@workspace/db";
@@ -11,6 +12,7 @@ const router: IRouter = Router();
 router.use(healthRouter);
 router.use("/admin", adminRouter);
 router.use("/upload", uploadRouter);
+router.use("/conversations", conversationsRouter);
 
 // Public watches endpoint for customers
 router.get("/watches", async (_req, res) => {
