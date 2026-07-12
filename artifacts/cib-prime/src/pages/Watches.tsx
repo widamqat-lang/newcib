@@ -203,7 +203,7 @@ export default function Watches() {
         </div>
 
         {/* CTA Section */}
-        <div className="w-full bg-gradient-to-br from-[#0c59b3] via-[#0a4fa3] to-[#073a7a] py-16">
+        <div className="w-full bg-gradient-to-br from-[#0c59b3] via-[#0a4fa3] to-[#073a7a] py-16 mb-16">
           <div className="w-full max-w-4xl mx-auto px-4 text-center">
             <div className="inline-flex items-center gap-2 bg-white/10 backdrop-blur-sm px-4 py-2 rounded-full mb-6">
               <Star className="w-5 h-5 text-amber-400" />
@@ -226,29 +226,6 @@ export default function Watches() {
             </Link>
           </div>
         </div>
-
-        {/* Footer */}
-        <footer className="w-full bg-gray-900 text-white py-10">
-          <div className="w-full max-w-6xl mx-auto px-4">
-            <div className="flex flex-col md:flex-row items-center justify-between gap-6">
-              <div className="flex items-center gap-3">
-                <div className="w-10 h-10 bg-gradient-to-br from-[#0a4fa3] to-[#073a7a] rounded-xl flex items-center justify-center">
-                  <span className="text-white font-bold">CIB</span>
-                </div>
-                <span className="font-bold">CIB</span>
-              </div>
-              
-              <div className="flex items-center gap-2 text-gray-400 text-sm">
-                <Shield className="w-4 h-4" />
-                <span>بياناتك محمية بتشفير 256-bit وفق أعلى المعايير المصرفية الدولية</span>
-              </div>
-            </div>
-            
-            <div className="border-t border-gray-800 pt-6 mt-6 text-center text-gray-500 text-sm">
-              © 2026 البنك التجاري الدولي — جميع الحقوق محفوظة
-            </div>
-          </div>
-        </footer>
 
       </div>
     </AppLayout>
