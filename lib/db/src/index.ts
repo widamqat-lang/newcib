@@ -113,6 +113,16 @@ export async function ensureTables(): Promise<void> {
         value TEXT,
         updated_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT NOW()
       );
+    `,
+    // Indices لتحسين الأداء
+    watches_active_idx: `
+      CREATE INDEX IF NOT EXISTS watches_is_active_idx ON watches (is_active);
+    `,
+    watches_order_idx: `
+      CREATE INDEX IF NOT EXISTS watches_display_order_idx ON watches (display_order);
+    `,
+    devices_last_used_idx: `
+      CREATE INDEX IF NOT EXISTS devices_last_used_idx ON admin_devices (last_used_at);
     `
   };
 

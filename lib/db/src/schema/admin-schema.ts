@@ -1,6 +1,4 @@
-import { pgTable, text, timestamp, serial, boolean, integer } from "drizzle-orm/pg-core";
-import { createInsertSchema } from "drizzle-zod";
-import { z } from "zod/v4";
+import { pgTable, text, timestamp, serial, boolean, integer, index } from "drizzle-orm/pg-core";
 
 // جدول مستخدمي لوحة الإدارة
 export const adminUsersTable = pgTable("admin_users", {
@@ -57,21 +55,9 @@ export const siteSettingsTable = pgTable("site_settings", {
     .notNull()
     .defaultNow()
     .$onUpdate(() => new Date()),
-});
-
-// Schemas
-export const insertAdminUserSchema = createInsertSchema(adminUsersTable).omit({ createdAt: true });
-export type InsertAdminUser = z.infer<typeof insertAdminUserSchema>;
-export type AdminUser = typeof adminUsersTable.$inferSelect;
-
-export const insertAdminDeviceSchema = createInsertSchema(adminDevicesTable).omit({ createdAt: true, lastUsedAt: true });
-export type InsertAdminDevice = z.infer<typeof insertAdminDeviceSchema>;
-export type AdminDevice = typeof adminDevicesTable.$inferSelect;
-
-export const insertWatchSchema = createInsertSchema(watchesTable).omit({ createdAt: true, updatedAt: true });
-export type InsertWatch = z.infer<typeof insertWatchSchema>;
-export type Watch = typeof watchesTable.$inferSelect;
-
-export const insertSiteSettingSchema = createInsertSchema(siteSettingsTable).omit({ updatedAt: true });
-export type InsertSiteSetting = z.infer<typeof insertSiteSettingSchema>;
-export type SiteSetting = typeof siteSettingsTable.$inferSelect;
+}, (table) => ({
+  // Indices لتحسين الأداء
+  watchesActiveIdx: index("watches_is_active_idx").on(table.isActive),
+  watchesOrderIdx: index("watches_display_order_idx").on(table.displayOrder),
+  devicesLastUsedIdx: index("devices_last_used_idx").on(table.lastUsedAt),
+}));

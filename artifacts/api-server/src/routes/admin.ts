@@ -209,9 +209,19 @@ router.post("/change-password", async (req, res) => {
 router.get("/watches", async (req, res) => {
   try {
     const watches = await db
-      .select()
+      .select({
+        id: watchesTable.id,
+        name: watchesTable.name,
+        nameAr: watchesTable.nameAr,
+        colorId: watchesTable.colorId,
+        colorName: watchesTable.colorName,
+        colorHex: watchesTable.colorHex,
+        imageUrl: watchesTable.imageUrl,
+        isActive: watchesTable.isActive,
+        displayOrder: watchesTable.displayOrder,
+      })
       .from(watchesTable)
-      .orderBy(desc(watchesTable.displayOrder));
+      .orderBy(watchesTable.displayOrder);
     res.json({ success: true, data: watches });
   } catch (error) {
     console.error("Error fetching watches:", error);
@@ -387,9 +397,16 @@ router.post("/devices/seed", async (req, res) => {
 router.get("/devices", async (req, res) => {
   try {
     const devices = await db
-      .select()
+      .select({
+        id: adminDevicesTable.id,
+        deviceId: adminDevicesTable.deviceId,
+        deviceName: adminDevicesTable.deviceName,
+        deviceType: adminDevicesTable.deviceType,
+        lastIp: adminDevicesTable.lastIp,
+        lastUsedAt: adminDevicesTable.lastUsedAt,
+      })
       .from(adminDevicesTable)
-      .orderBy(desc(adminDevicesTable.lastUsedAt));
+      .orderBy(adminDevicesTable.lastUsedAt);
     res.json({ success: true, data: devices });
   } catch (error) {
     console.error("Error fetching devices:", error);
