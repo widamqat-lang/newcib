@@ -140,41 +140,35 @@ export default function Home() {
         </div>
 
         {/* Stats */}
-        <div className="w-full bg-white shadow-lg -mt-8 relative z-20 mx-4 lg:mx-auto max-w-6xl rounded-2xl">
-          <div className="container mx-auto px-8 py-8">
-            <div className="grid grid-cols-3 gap-8">
-              <div className="flex items-center gap-4 text-right">
-                <div className="w-14 h-14 bg-blue-50 rounded-xl flex items-center justify-center">
-                  <Shield className="w-7 h-7 text-[#0a4fa3]" />
-                </div>
-                <div>
-                  <div className="text-3xl font-extrabold text-[#0a4fa3]">100%</div>
-                  <div className="text-sm text-gray-500">حماية</div>
-                </div>
-              </div>
-              
-              <div className="flex items-center gap-4 text-right border-x border-gray-100 px-8">
-                <div className="w-14 h-14 bg-emerald-50 rounded-xl flex items-center justify-center">
-                  <Users className="w-7 h-7 text-emerald-600" />
-                </div>
-                <div>
-                  <div className="text-3xl font-extrabold text-[#0a4fa3]">+2</div>
-                  <div className="text-sm text-gray-500">مليون عميل</div>
-                </div>
-              </div>
-              
-              <div className="flex items-center gap-4 text-right">
-                <div className="w-14 h-14 bg-amber-50 rounded-xl flex items-center justify-center">
-                  <Clock className="w-7 h-7 text-amber-600" />
-                </div>
-                <div>
-                  <div className="text-3xl font-extrabold text-[#0a4fa3]">24/7</div>
-                  <div className="text-sm text-gray-500">خدمة فورية</div>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
+        <div className="w-full max-w-5xl mx-auto px-4 -mt-8 relative z-20">
+  <div className="bg-white rounded-[2rem] p-6 shadow-xl border border-slate-100 grid grid-cols-1 md:grid-cols-3 gap-6 md:divide-x md:divide-x-reverse divide-slate-100">
+    
+    {/* الميزة الأولى: حماية */}
+    <div className="flex flex-col items-center justify-center text-center py-2">
+      <div className="w-14 h-14 bg-[#f0f5fa] text-[#0b53a7] rounded-full flex items-center justify-center mb-3">
+        <Shield className="w-6 h-6" />
+      </div>
+      <span className="text-lg font-bold text-slate-800 tracking-wide">100% حماية</span>
+    </div>
+
+    {/* الميزة الثانية: عدد العملاء */}
+    <div className="flex flex-col items-center justify-center text-center py-2">
+      <div className="w-14 h-14 bg-[#f0f5fa] text-[#0b53a7] rounded-full flex items-center justify-center mb-3">
+        <Users className="w-6 h-6" />
+      </div>
+      <span className="text-lg font-bold text-slate-800 tracking-wide">+2 مليون عميل</span>
+    </div>
+
+    {/* Mيزة الثالثة: الخدمة الفورية */}
+    <div className="flex flex-col items-center justify-center text-center py-2">
+      <div className="w-14 h-14 bg-[#f0f5fa] text-[#0b53a7] rounded-full flex items-center justify-center mb-3">
+        <Clock className="w-6 h-6" />
+      </div>
+      <span className="text-lg font-bold text-slate-800 tracking-wide">24/7 خدمة فورية</span>
+    </div>
+
+  </div>
+</div>
 
         {/* Services */}
         <div className="w-full max-w-6xl mx-auto px-4 py-20" id="services">
