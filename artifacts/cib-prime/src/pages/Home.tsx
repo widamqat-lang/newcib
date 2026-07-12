@@ -82,18 +82,15 @@ export default function Home() {
 
   return (
     <AppLayout>
-      {/* تم تصفير الهوامش العلوية والجانبية تماماً هنا p-0 */}
       <div className="w-full flex flex-col items-center justify-start flex-1 p-0 animate-in fade-in duration-500" dir="rtl">
         
-        {/* Hero Section - مع ضبط التدرج الخلفي اللامع */}
+        {/* Hero Section */}
         <div className="relative w-full bg-[#053d7c] bg-[radial-gradient(circle_at_center,_#0f68c3_0%,_#053770_55%,_#032249_100%)] pt-16 pb-40 flex flex-col items-center text-center overflow-hidden">
           
-          {/* تأثير النقاط الخلفية الخفيف */}
           <div className="absolute inset-0 bg-[radial-gradient(#ffffff06_1px,transparent_1px)] [background-size:20px_20px] opacity-70 pointer-events-none"></div>
 
           <div className="w-full px-6 relative z-10 flex flex-col items-center">
             
-            {/* دائرة الشعار الوسطية الكبيرة */}
             <div className="w-32 h-32 md:w-36 md:h-36 bg-white rounded-full shadow-[0_0_40px_rgba(15,104,195,0.4)] p-4 flex items-center justify-center mb-8 border-4 border-white/10 animate-in zoom-in-75 duration-500">
               <div className="text-[#0a4fa3] font-black text-3xl md:text-4xl tracking-tighter flex items-center gap-1">
                 <span className="border-2 border-[#0a4fa3] rounded-full p-1 text-base md:text-lg leading-none font-bold">CIB</span>
@@ -101,13 +98,11 @@ export default function Home() {
               </div>
             </div>
 
-            {/* التاج/العلامة البرتقالية العلوية */}
             <div className="inline-flex items-center gap-2 bg-white/5 border border-white/10 px-5 py-2 rounded-full mb-6">
               <Sparkles className="w-4 h-4 text-[#f08519]" />
               <span className="text-sm font-bold text-[#f08519] tracking-wide">مرحباً بك في تجربة بنكية جديدة</span>
             </div>
             
-            {/* العناوين الرئيسية بالخط العريض والألوان المطابقة */}
             <h1 className="text-3xl md:text-5xl font-black text-white mb-2 tracking-wide leading-tight">
               البنك التجاري الدولي
             </h1>
@@ -115,12 +110,10 @@ export default function Home() {
               CIB Egypt
             </h2>
             
-            {/* الوصف */}
             <p className="text-sm md:text-base text-blue-100/80 mb-8 max-w-xl leading-relaxed">
               services مصرفية بين يديك — أمان، سرعة وثقة في كل معاملة
             </p>
             
-            {/* أزرار التحكم بعرض مناسب ممتد مرن */}
             <div className="flex flex-col gap-4 w-full max-w-[340px] items-center justify-center mb-6">
               <Link 
                 href="/signup"
@@ -140,25 +133,24 @@ export default function Home() {
             </div>
           </div>
 
-         {/* 🌊 التدرج الانسيابي السفلي المندمج مع المنحنى المائل بدقة (مطابق للصورة) */}
-<div className="absolute bottom-0 left-0 right-0 w-full overflow-hidden leading-none z-10 pointer-events-none select-none">
-  {/* تدرج داكن خفيف فوق المنحنى مباشرة ليعطي عمقاً للتصميم الأزرق */}
-  <div className="w-full h-24 bg-gradient-to-b from-transparent to-[#032249]/30"></div>
-  
-  {/* رسمة المنحنى الانسيابي غير المتناظر بدقة عالية */}
-  <svg 
-    viewBox="0 0 1440 160" 
-    preserveAspectRatio="none" 
-    className="relative block w-full h-[70px] sm:h-[90px] fill-white text-white -mb-[1px]"
-  >
-    <path 
-      d="M0,64 C240,140 480,160 720,105 C960,50 1200,10 1440,75 L1440,160 L0,160 Z" 
-      className="fill-white"
-    ></path>
-  </svg>
-</div>
+          {/* 🌊 التدرج الانسيابي السفلي المندمج مع المنحنى المائل بدقة (مطابق للصورة) */}
+          <div className="absolute bottom-0 left-0 right-0 w-full overflow-hidden leading-none z-10 pointer-events-none select-none">
+            <div className="w-full h-24 bg-gradient-to-b from-transparent to-[#032249]/30"></div>
+            <svg 
+              viewBox="0 0 1440 160" 
+              preserveAspectRatio="none" 
+              className="relative block w-full h-[70px] sm:h-[90px] fill-white text-white -mb-[1px]"
+            >
+              <path 
+                d="M0,64 C240,140 480,160 720,105 C960,50 1200,10 1440,75 L1440,160 L0,160 Z" 
+                className="fill-white"
+              ></path>
+            </svg>
+          </div>
 
-        {/* Stats - تم الحفاظ على الكرت ليرتفع فوق المنحنى بنعومة وبدون فراغ غريب */}
+        </div>
+
+        {/* Stats */}
         <div className="w-full max-w-5xl mx-auto px-4 -mt-12 relative z-20">
           <div className="bg-white rounded-[2rem] p-6 shadow-xl border border-slate-100 grid grid-cols-1 md:grid-cols-3 gap-6 md:divide-x md:divide-x-reverse divide-slate-100">
             <div className="flex flex-col items-center justify-center text-center py-2">
