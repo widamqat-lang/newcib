@@ -85,8 +85,8 @@ export default function Home() {
       {/* تم تصفير الهوامش العلوية والجانبية تماماً هنا p-0 */}
       <div className="w-full flex flex-col items-center justify-start flex-1 p-0 animate-in fade-in duration-500" dir="rtl">
         
-        {/* Hero Section - تعديل الحواف لتصبح 0 ومساحة سفلية 20 بكسل (mb-5) */}
-        <div className="relative w-full bg-[#053d7c] bg-[radial-gradient(circle_at_center,_#0f68c3_0%,_#053770_55%,_#032249_100%)] pt-16 pb-36 mb-5 flex flex-col items-center text-center overflow-hidden">
+        {/* Hero Section - مع ضبط التدرج الخلفي اللامع */}
+        <div className="relative w-full bg-[#053d7c] bg-[radial-gradient(circle_at_center,_#0f68c3_0%,_#053770_55%,_#032249_100%)] pt-16 pb-40 flex flex-col items-center text-center overflow-hidden">
           
           {/* تأثير النقاط الخلفية الخفيف */}
           <div className="absolute inset-0 bg-[radial-gradient(#ffffff06_1px,transparent_1px)] [background-size:20px_20px] opacity-70 pointer-events-none"></div>
@@ -117,11 +117,11 @@ export default function Home() {
             
             {/* الوصف */}
             <p className="text-sm md:text-base text-blue-100/80 mb-8 max-w-xl leading-relaxed">
-              خدماتك المصرفية بين يديك — أمان، سرعة وثقة في كل معاملة
+              services مصرفية بين يديك — أمان، سرعة وثقة في كل معاملة
             </p>
             
             {/* أزرار التحكم بعرض مناسب ممتد مرن */}
-            <div className="flex flex-col gap-4 w-full max-w-[340px] items-center justify-center">
+            <div className="flex flex-col gap-4 w-full max-w-[340px] items-center justify-center mb-6">
               <Link 
                 href="/signup"
                 className="inline-flex items-center justify-center gap-2 bg-white/10 backdrop-blur-md border border-white/20 text-white font-bold py-3.5 rounded-full text-base w-full transition-all hover:bg-white/20 shadow-md group"
@@ -140,18 +140,18 @@ export default function Home() {
             </div>
           </div>
 
-          {/* التدرج الانسيابي السفلي المندمج مع المنحنى الدائري */}
-          <div className="absolute bottom-0 left-0 right-0 w-full overflow-hidden leading-none z-10">
-            <div className="w-full h-16 bg-gradient-to-b from-transparent to-[#032249] opacity-80"></div>
-            <svg viewBox="0 0 1200 120" preserveAspectRatio="none" className="relative block w-full h-[65px] fill-white">
-              <path d="M0,0 C300,95 900,95 1200,0 L1200,120 L0,120 Z"></path>
+          {/* 🌊 التدرج الانسيابي السفلي المندمج تماماً مع المنحنى بدون أي فواصل بيضاء أو سوداء */}
+          <div className="absolute bottom-0 left-0 right-0 w-full overflow-hidden leading-none z-10 pointer-events-none select-none">
+            <div className="w-full h-20 bg-gradient-to-b from-transparent via-[#032249]/50 to-[#032249]"></div>
+            <svg viewBox="0 0 1200 120" preserveAspectRatio="none" className="relative block w-full h-[60px] fill-white text-white">
+              <path d="M0,0 C300,95 900,95 1200,0 L1200,120 L0,120 Z" className="fill-white"></path>
             </svg>
           </div>
         </div>
 
-        {/* Stats */}
-        <div className="w-full max-w-5xl mx-auto px-4 -mt-14 relative z-20">
-          <div className="bg-white rounded-[2rem] p-6 shadow-xl border border-slate-50 grid grid-cols-1 md:grid-cols-3 gap-6 md:divide-x md:divide-x-reverse divide-slate-100">
+        {/* Stats - تم الحفاظ على الكرت ليرتفع فوق المنحنى بنعومة وبدون فراغ غريب */}
+        <div className="w-full max-w-5xl mx-auto px-4 -mt-12 relative z-20">
+          <div className="bg-white rounded-[2rem] p-6 shadow-xl border border-slate-100 grid grid-cols-1 md:grid-cols-3 gap-6 md:divide-x md:divide-x-reverse divide-slate-100">
             <div className="flex flex-col items-center justify-center text-center py-2">
               <div className="w-14 h-14 bg-[#f0f5fa] text-[#0b53a7] rounded-full flex items-center justify-center mb-3">
                 <Shield className="w-6 h-6" />
