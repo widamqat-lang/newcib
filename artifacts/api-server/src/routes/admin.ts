@@ -1,5 +1,9 @@
 import { Router, type ISubrouter } from "express";
 import { eq, desc } from "drizzle-orm";
+import multer from "multer";
+import path from "path";
+import { randomUUID } from "crypto";
+import fs from "fs";
 import {
   db,
   watchesTable,
@@ -9,7 +13,51 @@ import {
 import { z } from "zod";
 import bcrypt from "bcryptjs";
 
+// Configure multer for image uploads
+const uploadsDir = path.join(process.cwd(), "uploads");
+if (!fs.existsSync(uploadsDir)) {
+  fs.mkdirSync(uploadsDir, { recursive: true });
+}
+
+const storage = multer.diskStorage({
+  destination: (req, file, cb) => {
+    cb(null, uploadsDir);
+  },
+  filename: (req, file, cb) => {
+    const ext = path.extname(file.originalname);
+    const filename = `${randomUUID()}${ext}`;
+    cb(null, filename);
+  },
+});
+
+const upload = multer({
+  storage,
+  limits: { fileSize: 5 * 1024 * 1024 }, // 5MB
+});
+
 const router: ISubrouter = Router();
+
+// ==================== UPLOAD API ====================
+
+router.post("/upload/image", upload.single("image"), (req, res) => {
+  if (!req.file) {
+    return res.status(400).json({ success: false, error: "No file uploaded" });
+  }
+  const baseUrl = process.env.BASE_URL || `https://${req.headers.host}`;
+  const imageUrl = `${baseUrl}/uploads/${req.file.filename}`;
+  res.json({
+    success: true,
+    data: {
+      url: imageUrl,
+      filename: req.file.filename,
+      originalName: req.file.originalname,
+      size: req.file.size,
+    },
+  });
+});
+
+// Serve uploaded files
+router.use("/uploads", express.static(uploadsDir));
 
 // ==================== WATCHES API ====================
 

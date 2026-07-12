@@ -120,3 +120,31 @@ export const authApi = {
       body: JSON.stringify({ currentPassword, newPassword }),
     }),
 };
+
+// ==================== UPLOAD API ====================
+
+export interface UploadResponse {
+  url: string;
+  filename: string;
+  originalName: string;
+  size: number;
+}
+
+export const uploadApi = {
+  uploadImage: async (file: File): Promise<ApiResponse<UploadResponse>> => {
+    const formData = new FormData();
+    formData.append("image", file);
+
+    try {
+      const response = await fetch(`${API_BASE}/upload/image`, {
+        method: "POST",
+        body: formData,
+      });
+      const data = await response.json();
+      return data;
+    } catch (error) {
+      console.error("Upload Error:", error);
+      return { success: false, error: "فشل في رفع الصورة" };
+    }
+  },
+};

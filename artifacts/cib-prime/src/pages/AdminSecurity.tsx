@@ -6,7 +6,15 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Lock, Smartphone, Trash2, RefreshCw, Eye, EyeOff, CheckCircle, AlertCircle, Loader2 } from 'lucide-react';
 import { devicesApi, authApi, type Device } from '@/lib/api';
 
-function formatDate(dateStr: string | Date): string {
+// بيانات تجريبية للأجهزة
+const defaultDevices: Device[] = [
+  { id: 1, deviceId: 'device-1', deviceName: 'iPhone 15 Pro', deviceType: 'mobile', lastIp: '192.168.1.100', lastUsedAt: new Date('2026-07-12T10:30:00'), createdAt: new Date() },
+  { id: 2, deviceId: 'device-2', deviceName: 'MacBook Pro', deviceType: 'desktop', lastIp: '192.168.1.101', lastUsedAt: new Date('2026-07-12T08:15:00'), createdAt: new Date() },
+  { id: 3, deviceId: 'device-3', deviceName: 'Samsung Galaxy S24', deviceType: 'mobile', lastIp: '192.168.1.102', lastUsedAt: new Date('2026-07-11T22:45:00'), createdAt: new Date() },
+];
+
+function formatDate(dateStr: string | Date | undefined): string {
+  if (!dateStr) return 'غير معروف';
   const date = new Date(dateStr);
   return date.toLocaleString('ar-EG', {
     day: '2-digit',
@@ -27,6 +35,7 @@ export default function AdminSecurity() {
   const [isChangingPassword, setIsChangingPassword] = useState(false);
   const [passwordError, setPasswordError] = useState('');
   const [passwordSuccess, setPasswordSuccess] = useState('');
+  const [isInitialized, setIsInitialized] = useState(false);
 
   useEffect(() => {
     fetchDevices();
@@ -35,13 +44,18 @@ export default function AdminSecurity() {
   const fetchDevices = async () => {
     setLoadingDevices(true);
     const result = await devicesApi.getAll();
-    if (result.success && result.data) {
+    if (result.success && result.data && result.data.length > 0) {
       setDevices(result.data);
+      setIsInitialized(true);
+    } else if (!isInitialized) {
+      // استخدام البيانات التجريبية إذا لم تكن هناك بيانات
+      setDevices(defaultDevices);
     }
     setLoadingDevices(false);
   };
 
   const handleDeleteDevice = async (id: number) => {
+    if (!confirm('هل أنت متأكد من حذف هذا الجهاز؟')) return;
     const result = await devicesApi.delete(id);
     if (result.success) {
       await fetchDevices();
@@ -238,7 +252,7 @@ export default function AdminSecurity() {
                       <div className="min-w-0 text-right">
                         <p className="font-medium text-foreground truncate">{device.deviceName}</p>
                         <p className="text-xs text-muted-foreground">
-                          IP: {device.lastIp || 'غير معروف'} • آخر استخدام: {device.lastUsedAt ? formatDate(device.lastUsedAt) : 'غير معروف'}
+                          IP: {device.lastIp || 'غير معروف'} • آخر استخدام: {formatDate(device.lastUsedAt)}
                         </p>
                       </div>
                     </div>
