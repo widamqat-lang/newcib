@@ -65,7 +65,16 @@ function CustomerApp() {
 
 function AppRoutes() {
   const [location] = useLocation();
-  if (location === '/admin' || location.startsWith('/admin/')) {
+  if (location.startsWith('/admin')) {
+    if (location === '/admin' || location === '/admin/') {
+      return <Admin />;
+    }
+    if (location.startsWith('/admin/content')) {
+      return <AdminContent />;
+    }
+    if (location.startsWith('/admin/security')) {
+      return <AdminSecurity />;
+    }
     return <Admin />;
   }
   return <CustomerApp />;
