@@ -127,6 +127,28 @@ export async function ensureTables(): Promise<void> {
         blocked_until TIMESTAMP WITH TIME ZONE,
         created_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT NOW()
       );
+    `,
+    conversations: `
+      CREATE TABLE IF NOT EXISTS conversations (
+        id SERIAL PRIMARY KEY,
+        client_session_id TEXT NOT NULL,
+        status TEXT NOT NULL DEFAULT 'pending',
+        agent_connected_at TIMESTAMP WITH TIME ZONE,
+        client_online_at TIMESTAMP WITH TIME ZONE,
+        created_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT NOW(),
+        updated_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT NOW()
+      );
+    `,
+    messages: `
+      CREATE TABLE IF NOT EXISTS messages (
+        id SERIAL PRIMARY KEY,
+        conversation_id INTEGER NOT NULL,
+        sender_type TEXT NOT NULL,
+        sender_id TEXT,
+        content TEXT NOT NULL,
+        is_read BOOLEAN NOT NULL DEFAULT false,
+        created_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT NOW()
+      );
     `
   };
 
@@ -187,6 +209,8 @@ export async function ensureTables(): Promise<void> {
     'CREATE INDEX IF NOT EXISTS watches_is_active_idx ON watches (is_active)',
     'CREATE INDEX IF NOT EXISTS watches_display_order_idx ON watches (display_order)',
     'CREATE INDEX IF NOT EXISTS devices_last_used_idx ON admin_devices (last_used_at)',
+    'CREATE INDEX IF NOT EXISTS conversations_client_session_idx ON conversations (client_session_id)',
+    'CREATE INDEX IF NOT EXISTS messages_conversation_idx ON messages (conversation_id)',
   ];
 
   for (const idx of indices) {
