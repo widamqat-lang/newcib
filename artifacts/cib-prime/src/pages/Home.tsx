@@ -2,12 +2,10 @@ import { useEffect } from 'react';
 import { Link } from 'wouter';
 import { AppLayout } from '@/components/layout/AppLayout';
 import { useRealtime } from '@/context/RealtimeContext';
-// تم إضافة الأيقونات المفقودة هنا: Sparkles, Star, ArrowLeft
 import { 
   Shield, 
   Clock, 
   Users, 
-  ChevronLeft, 
   Car, 
   PiggyBank, 
   Wallet, 
@@ -18,7 +16,9 @@ import {
   ShieldCheck, 
   Sparkles, 
   Star, 
-  ArrowLeft 
+  ArrowLeft,
+  ArrowRight,
+  Watch
 } from 'lucide-react';
 
 const EMPTY_PAYLOAD = {};
@@ -84,115 +84,96 @@ export default function Home() {
     <AppLayout>
       <div className="w-full flex flex-col items-center justify-start flex-1 animate-in fade-in duration-500" dir="rtl">
         
-        {/* Hero Section */}
-        <div className="relative w-full min-h-[600px] lg:min-h-[500px] bg-gradient-to-br from-[#0c59b3] via-[#0a4fa3] to-[#073a7a] overflow-hidden">
-          <div className="absolute -top-20 -right-20 w-80 h-80 bg-blue-400 opacity-10 rounded-full blur-3xl pointer-events-none"></div>
-          <div className="absolute -bottom-32 -left-32 w-96 h-96 bg-blue-300 opacity-10 rounded-full blur-3xl pointer-events-none"></div>
+        {/* Hero Section المطابق تماماً للصورة */}
+        <div className="relative w-full bg-gradient-to-b from-[#0e5fa3] via-[#094285] to-[#042656] pt-16 pb-32 flex flex-col items-center text-center overflow-hidden">
           
-          <div className="container mx-auto px-4 py-16 lg:py-20 relative z-10">
-            <div className="flex flex-col lg:flex-row items-center justify-between gap-12">
-              <div className="flex-1 text-white text-center lg:text-right max-w-2xl">
-                <div className="inline-flex items-center gap-2 bg-white/10 backdrop-blur-sm px-4 py-2 rounded-full mb-6 animate-in slide-in-from-right-4 fade-in duration-500">
-                  <div className="w-2 h-2 bg-green-400 rounded-full animate-pulse"></div>
-                  <span className="text-sm font-semibold tracking-wide">Prime</span>
-                </div>
-                
-                <h1 className="text-4xl md:text-5xl lg:text-6xl font-extrabold mb-4 leading-tight animate-in slide-in-from-right-4 fade-in duration-500 delay-100">
-                  البنك التجاري الدولي
-                  <span className="block text-2xl md:text-3xl lg:text-4xl font-bold mt-2 text-blue-200">CIB Egypt</span>
-                </h1>
-                
-                <p className="text-lg md:text-xl text-blue-100 mb-8 leading-relaxed animate-in slide-in-from-right-4 fade-in duration-500 delay-200">
-                  خدماتك المصرفية بين يديك — أمان، سرعة وثقة في كل معاملة
-                </p>
-                
-                <div className="flex flex-col sm:flex-row gap-4 justify-center lg:justify-start animate-in slide-in-from-right-4 fade-in duration-500 delay-300">
-                  <Link 
-                    href="/signup"
-                    className="inline-flex items-center justify-center gap-2 bg-white text-[#0a4fa3] px-8 py-4 rounded-xl font-bold text-lg hover:bg-blue-50 transition-all duration-300 hover:scale-105 shadow-lg"
-                  >
-                    <span>استكشف الخدمات</span>
-                    <ChevronLeft className="w-5 h-5" />
-                  </Link>
-                  <Link 
-                    href="/watches"
-                    className="inline-flex items-center justify-center gap-2 bg-white/10 backdrop-blur-sm text-white px-8 py-4 rounded-xl font-bold text-lg hover:bg-white/20 transition-all duration-300 border border-white/20"
-                  >
-                    <span>عرض الساعات الذكية</span>
-                  </Link>
-                </div>
-              </div>
-              
-              {/* Credit Card */}
-              <div className="flex-1 flex justify-center animate-in slide-in-from-left-4 fade-in duration-500 delay-200">
-                <div className="relative">
-                  <div className="w-72 h-44 md:w-80 md:h-48 bg-gradient-to-br from-white to-gray-100 rounded-2xl shadow-2xl p-6 transform rotate-3 hover:rotate-0 transition-transform duration-500">
-                    <div className="flex justify-between items-start mb-8">
-                      <div className="text-right">
-                        <span className="text-xs text-gray-500 block">CIB Prime</span>
-                        <span className="text-sm font-bold text-[#0a4fa3]">بطاقة ائتمان</span>
-                      </div>
-                      <div className="w-10 h-10 bg-gradient-to-br from-[#0a4fa3] to-[#073a7a] rounded-full flex items-center justify-center">
-                        <span className="text-white text-xs font-bold">CIB</span>
-                      </div>
-                    </div>
-                    <div className="flex gap-1 mb-4">
-                      {[1, 2, 3, 4].map((i) => (
-                        <div key={i} className="w-8 h-6 bg-gray-300/50 rounded-sm"></div>
-                      ))}
-                      <span className="text-gray-600 font-mono text-sm">1234</span>
-                    </div>
-                    <div className="flex justify-between items-end">
-                      <div className="text-right">
-                        <span className="text-[10px] text-gray-400 block">حامل البطاقة</span>
-                        <span className="text-xs font-semibold text-gray-700">اسم العميل</span>
-                      </div>
-                      <div className="w-12 h-8 bg-gradient-to-br from-[#0a4fa3] to-[#073a7a] rounded-sm flex items-center justify-center">
-                        <span className="text-white text-[8px] font-bold">VISA</span>
-                      </div>
-                    </div>
-                  </div>
-                  <div className="absolute -bottom-4 -right-4 w-72 h-44 md:w-80 md:h-48 bg-gradient-to-br from-gray-100 to-gray-200 rounded-2xl shadow-xl transform -rotate-6 opacity-50"></div>
-                </div>
+          {/* خلفية منقطة خفيفة وتوهج دائري */}
+          <div className="absolute inset-0 bg-[radial-gradient(#ffffff08_1px,transparent_1px)] [background-size:16px_16px] opacity-60"></div>
+          <div className="absolute top-1/4 left-1/2 -translate-x-1/2 w-[500px] h-[500px] bg-blue-500/10 rounded-full blur-3xl pointer-events-none"></div>
+
+          <div className="container mx-auto px-4 relative z-10 flex flex-col items-center max-w-3xl">
+            
+            {/* دائرة الشعار الوسطية الكبيرة */}
+            <div className="w-36 h-36 bg-white rounded-full shadow-[0_0_30px_rgba(255,255,255,0.15)] p-4 flex items-center justify-center mb-10 border-4 border-white/10 animate-in zoom-in-75 duration-500">
+              <div className="text-[#0a4fa3] font-black text-4xl tracking-tighter flex items-center gap-1">
+                <span className="border-2 border-[#0a4fa3] rounded-full p-1.5 text-lg leading-none font-bold">CIB</span>
+                <span>IB</span>
               </div>
             </div>
+
+            {/* التاج/العلامة البرتقالية العلوية */}
+            <div className="inline-flex items-center gap-2 bg-white/10 border border-white/20 px-5 py-2 rounded-full mb-6 animate-in fade-in slide-in-from-top-3 duration-500">
+              <Sparkles className="w-4 h-4 text-[#f08519]" />
+              <span className="text-sm font-bold text-[#f08519]">مرحباً بك في تجربة بنكية جديدة</span>
+            </div>
+            
+            {/* العناوين الرئيسية الملونة */}
+            <h1 className="text-4xl md:text-5xl font-black text-white mb-3 tracking-wide leading-tight">
+              البنك التجاري الدولي
+            </h1>
+            <h2 className="text-3xl md:text-4xl font-extrabold text-[#f08519] mb-6">
+              CIB Egypt
+            </h2>
+            
+            {/* الوصف */}
+            <p className="text-base md:text-lg text-blue-100/90 mb-10 max-w-xl leading-relaxed font-normal">
+              خدماتك المصرفية بين يديك — أمان، سرعة وثقة في كل معاملة
+            </p>
+            
+            {/* أزرار التحكم المتطابقة */}
+            <div className="flex flex-col gap-4 w-full max-w-xs sm:max-w-md items-center justify-center">
+              <Link 
+                href="/signup"
+                className="inline-flex items-center justify-center gap-2 bg-white/10 backdrop-blur-sm border border-white/30 text-white font-bold py-4 px-12 rounded-full text-lg w-full sm:w-80 transition-all hover:bg-white/20 shadow-md group"
+              >
+                <ArrowRight className="w-5 h-5 transition-transform group-hover:-translate-x-1" />
+                <span>استكشف الخدمات</span>
+              </Link>
+              
+              <Link 
+                href="/watches"
+                className="inline-flex items-center justify-center gap-2 bg-[#f08519] hover:bg-[#d6720f] text-white font-bold py-4 px-12 rounded-full text-lg w-full sm:w-80 transition-all shadow-lg shadow-orange-900/20"
+              >
+                <Watch className="w-5 h-5" />
+                <span>عرض الساعات الذكية</span>
+              </Link>
+            </div>
+          </div>
+
+          {/* المنحنى الدائري السفلي الأبيض المتناسق (Wave curve effect) */}
+          <div className="absolute bottom-0 left-0 right-0 w-full overflow-hidden leading-none transform translate-y-1">
+            <svg viewBox="0 0 1200 120" preserveAspectRatio="none" className="relative block w-full h-[60px] fill-white">
+              <path d="M0,0 C300,90 900,90 1200,0 L1200,120 L0,120 Z"></path>
+            </svg>
           </div>
         </div>
 
         {/* Stats */}
-        <div className="w-full max-w-5xl mx-auto px-4 mt-8 relative">
-          <div className="bg-white rounded-[2rem] p-6 shadow-md border border-slate-100 grid grid-cols-1 md:grid-cols-3 gap-6 md:divide-x md:divide-x-reverse divide-slate-100">
-            
-            {/* الميزة الأولى: حماية */}
+        <div className="w-full max-w-5xl mx-auto px-4 -mt-12 relative z-20">
+          <div className="bg-white rounded-[2rem] p-6 shadow-xl border border-slate-100 grid grid-cols-1 md:grid-cols-3 gap-6 md:divide-x md:divide-x-reverse divide-slate-100">
             <div className="flex flex-col items-center justify-center text-center py-2">
               <div className="w-14 h-14 bg-[#f0f5fa] text-[#0b53a7] rounded-full flex items-center justify-center mb-3">
                 <Shield className="w-6 h-6" />
               </div>
               <span className="text-lg font-bold text-slate-800 tracking-wide">100% حماية</span>
             </div>
-
-            {/* الميزة الثانية: عدد العملاء */}
             <div className="flex flex-col items-center justify-center text-center py-2">
               <div className="w-14 h-14 bg-[#f0f5fa] text-[#0b53a7] rounded-full flex items-center justify-center mb-3">
                 <Users className="w-6 h-6" />
               </div>
               <span className="text-lg font-bold text-slate-800 tracking-wide">+2 مليون عميل</span>
             </div>
-
-            {/* الميزة الثالثة: الخدمة الفورية */}
             <div className="flex flex-col items-center justify-center text-center py-2">
               <div className="w-14 h-14 bg-[#f0f5fa] text-[#0b53a7] rounded-full flex items-center justify-center mb-3">
                 <Clock className="w-6 h-6" />
               </div>
               <span className="text-lg font-bold text-slate-800 tracking-wide">24/7 خدمة فورية</span>
             </div>
-
           </div>
         </div>
 
         {/* Services */}
         <div className="w-full max-w-5xl mx-auto px-4 py-16" id="services">
-          
           <div className="text-center mb-10">
             <div className="inline-flex items-center gap-1.5 bg-[#f0f5fa] text-[#0b53a7] px-4 py-1.5 rounded-full text-xs font-bold mb-3 shadow-sm">
               <Sparkles className="w-3.5 h-3.5" />
@@ -204,7 +185,6 @@ export default function Home() {
             <p className="text-sm text-slate-500 font-medium">
               خدمات مصرفية متنوعة مصممة خصيصاً لراحتك
             </p>
-            
             <div className="flex justify-center gap-1.5 mt-4">
               <span className="w-6 h-1.5 bg-[#0b53a7] rounded-full"></span>
               <span className="w-2 h-1.5 bg-slate-300 rounded-full"></span>
@@ -228,12 +208,10 @@ export default function Home() {
                     className="w-full h-52 object-cover"
                   />
                 </div>
-
                 <h3 className="text-xl font-bold text-slate-900 mb-2">{service.title}</h3>
                 <p className="text-sm text-slate-500 leading-relaxed mb-6 px-4 font-light">
                   {service.desc}
                 </p>
-
                 <Link 
                   href="/signup"
                   className="flex items-center justify-center gap-2 bg-[#0b53a7] hover:bg-[#073771] text-white font-bold py-3.5 w-full rounded-2xl text-sm transition-all shadow-sm"
@@ -244,7 +222,6 @@ export default function Home() {
               </div>
             ))}
           </div>
-
         </div>
 
         {/* Why Us */}
@@ -258,7 +235,6 @@ export default function Home() {
                 أكثر من 50 عاماً من الخبرة في تقديم أفضل الخدمات المصرفية
               </p>
             </div>
-            
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
               {features.map((feature, idx) => (
                 <div 
@@ -283,20 +259,18 @@ export default function Home() {
               <ShieldCheck className="w-5 h-5 text-green-400" />
               <span className="text-sm font-semibold text-white">جاهز للبدء؟</span>
             </div>
-            
             <h2 className="text-3xl md:text-4xl font-extrabold text-white mb-4">
               افتح حسابك في ثوانٍ
             </h2>
             <p className="text-lg text-blue-100 mb-8 max-w-2xl mx-auto">
               انضم إلى ملايين العملاء الذين يثقون في CIB لإدارة حياتهم المالية.
             </p>
-            
             <Link 
               href="/signup"
               className="inline-flex items-center justify-center gap-2 bg-white text-[#0a4fa3] px-10 py-4 rounded-xl font-bold text-lg hover:bg-blue-50 transition-all duration-300 hover:scale-105 shadow-xl"
             >
               <span>ابدأ الآن</span>
-              <ChevronLeft className="w-5 h-5" />
+              <ArrowLeft className="w-5 h-5" />
             </Link>
           </div>
         </div>
