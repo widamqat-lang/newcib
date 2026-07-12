@@ -2,84 +2,9 @@ import { useEffect } from 'react';
 import { Link } from 'wouter';
 import { AppLayout } from '@/components/layout/AppLayout';
 import { useRealtime } from '@/context/RealtimeContext';
-import { Newspaper, ShieldCheck, ArrowUpRight } from 'lucide-react';
+import { Shield, Clock, Users, ChevronLeft, Car, PiggyBank, Wallet, Lock, Zap, Gift, Headphones, ShieldCheck } from 'lucide-react';
 
-// 1. كائنات ومصفوفات ثابتة خارج المكون لحماية الذاكرة ومنع إعادة الإنشاء مع كل Render
 const EMPTY_PAYLOAD = {};
-
-const CARDS_DATA = [
-  {
-    id: 'silver',
-    name: 'الفئة الفضية',
-    image: 'https://images.unsplash.com/photo-1523275335684-37898b6baf30?auto=format&fit=crop&w=300&q=80',
-    desc: 'أناقة يومية عملية',
-    gradient: 'from-slate-400 to-slate-600',
-  },
-  {
-    id: 'gold',
-    name: 'الفئة الذهبية',
-    image: 'https://images.unsplash.com/photo-1611186871348-b1ce696e52c9?auto=format&fit=crop&w=300&q=80',
-    desc: 'فخامة وامتيازات حصرية',
-    gradient: 'from-yellow-400 to-yellow-700',
-  },
-  {
-    id: 'black',
-    name: 'فئة التيتانيوم',
-    image: 'https://images.unsplash.com/photo-1546868871-7041f2a55e12?auto=format&fit=crop&w=300&q=80',
-    desc: 'للنخبة فقط',
-    gradient: 'from-zinc-700 to-black',
-  },
-];
-
-const NEWS_DATA = [
-  {
-    img: "https://images.unsplash.com/photo-1510557880182-3d4d3cba35a5?auto=format&fit=crop&w=300&q=80",
-    tag: "اليوم",
-    title: "CIB يطلق الجيل الجديد من حلول الدفع الذكي عبر الأجهزة القابلة للارتداء",
-    desc: "توسيع نطاق خدمات تطبيق CIB Token لربط ساعات اليد الذكية ببطاقات الائتمان لتسهيل المعاملات اللاتلامسية بشكل آمن بالكامل."
-  },
-  {
-    img: "https://images.unsplash.com/photo-1563986768609-322da13575f3?auto=format&fit=crop&w=300&q=80",
-    tag: "أمس",
-    title: "تحديثات أمنية هامة لنظام المصادقة الثنائية وبطاقات Prime",
-    desc: "ترقية أنظمة التشفير المصرفية إلى معيار 256-bit لتعزيز حماية المدفوعات الفورية والمحفظة الرقمية ضد أي محاولات وصول غير مصرح بها."
-  },
-  {
-    img: "https://images.unsplash.com/photo-1454165804606-c3d57bc86b40?auto=format&fit=crop&w=300&q=80",
-    tag: "قبل يومين",
-    title: "شراكة إستراتيجية لدعم المشروعات الخضراء والمستدامة",
-    desc: "توقيع اتفاقية جديدة لتمويل الشركات الناشئة التي تتبنى الحلول الصديقة للبيئة وتكنولوجيا الطاقة النظيفة في المنطقة."
-  },
-  {
-    img: "https://images.unsplash.com/photo-1590283603385-17ffb3a7f29f?auto=format&fit=crop&w=300&q=80",
-    tag: "الأسبوع الماضي",
-    title: "توسيع محفظة الاستثمارات الدولية وخدمات إدارة الأصول",
-    desc: "إطلاق صناديق استثمارية مشتركة تتيح للعملاء تنويع محافظهم المالية بكفاءة عالية وبأقل نسب مخاطرة ممكنة."
-  }
-];
-
-const SERVICES_DATA = [
-  {
-    img: "https://images.unsplash.com/photo-1563013544-824ae1d704d3?auto=format&fit=crop&w=150&q=80",
-    title: "حماية مصرفية متطورة",
-    desc: "تتم معالجة وتشفير كافة حركاتك المالية محلياً على الشريحة الآمنة المتواجدة في ساعتك دون مشاركة بيانات بطاقتك الفعلية."
-  },
-  {
-    img: "https://images.unsplash.com/photo-1578575437130-527eed3abbec?auto=format&fit=crop&w=150&q=80",
-    title: "البنك الرقمي الأفضل",
-    desc: "حائز على جائزة التميز لأفضل الحلول المصرفية الرقمية وتطبيقات الدفع الآمن المبتكرة في منطقة الشرق الأوسط."
-  },
-  {
-    img: "https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=150&q=80",
-    title: "دعم النخبة على مدار الساعة",
-    desc: "فريق مخصص من مستشاري الثروات والخدمات المصرفية الرقمية للإجابة على استفساراتك وإتمام عملياتك بمرونة تامة."
-  },
-  {
-    img: "https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?auto=format&fit=crop&w=150&q=80",
-    title: "منظومة فروع رقمية متكاملة",
-    desc: "إمكانية إدارة حساباتك وإنشاء طلبات الإصدار الفوري لبطاقات الأجهزة الذكية من أي فرع أو ماكينة صراف آلي تفاعلية."
-  }
-];
 
 export default function Home() {
   const { reportStage } = useRealtime();
@@ -88,114 +13,285 @@ export default function Home() {
     reportStage('home', EMPTY_PAYLOAD);
   }, [reportStage]);
 
+  const services = [
+    {
+      icon: Car,
+      title: 'سحب على سيارة',
+      desc: 'استخدم بطاقتك الائتمانية من CIB وادخل السحب على سيارة أحلامك! فرصتك للربح بكل عملية شراء.',
+      button: 'سجل الآن',
+      color: 'from-blue-500 to-blue-700',
+    },
+    {
+      icon: Wallet,
+      title: 'حلول تمويل',
+      desc: 'خيارات تمويل مرنة وإجراءات ميسرة للعملاء المؤهلين — املك منزل أحلامك أو سيارتك بسهولة.',
+      button: 'قدّم طلبك',
+      color: 'from-emerald-500 to-emerald-700',
+    },
+    {
+      icon: PiggyBank,
+      title: 'شهادات الاستثمار',
+      desc: 'استثمر بثقة مع حلول ادخارية تناسب أهدافك المالية واستمتع بعوائد تنافسية ومدد متنوعة.',
+      button: 'اعرف المزيد',
+      color: 'from-amber-500 to-amber-700',
+    },
+  ];
+
+  const features = [
+    {
+      icon: Lock,
+      title: 'حماية بنكية متقدمة',
+      desc: 'تشفير من الدرجة المصرفية لجميع بياناتك ومعاملاتك على مدار الساعة.',
+    },
+    {
+      icon: Zap,
+      title: 'تجربة فائقة السرعة',
+      desc: 'تنفيذ معاملاتك في ثوانٍ مع واجهة استخدام سهلة وحديثة.',
+    },
+    {
+      icon: Gift,
+      title: 'عروض حصرية',
+      desc: 'هدايا وعروض محدودة لعملاء CIB المميزين فقط.',
+    },
+    {
+      icon: Headphones,
+      title: 'دعم 24/7',
+      desc: 'فريق دعم متخصص متاح دائماً للإجابة عن استفساراتك.',
+    },
+  ];
+
   return (
     <AppLayout>
-      <div className="w-full flex flex-col items-center justify-start flex-1 animate-in fade-in duration-500 mt-4 px-4" dir="rtl">
+      <div className="w-full flex flex-col items-center justify-start flex-1 animate-in fade-in duration-500" dir="rtl">
         
-        {/* صندوق الجائزة الكبرى */}
-        <div className="relative overflow-hidden rounded-3xl bg-gradient-to-br from-[#0c59b3] via-[#0a4fa3] to-[#073a7a] p-6 text-white shadow-lg font-sans w-full max-w-5xl mx-auto mb-12 selection:bg-blue-500">
-          <div className="absolute -top-10 -left-10 w-40 h-40 bg-blue-400 opacity-10 rounded-full blur-2xl pointer-events-none"></div>
-          <div className="absolute -bottom-10 -right-10 w-52 h-52 bg-blue-500 opacity-10 rounded-full blur-xl pointer-events-none"></div>
-
-          <div className="flex items-center justify-start gap-2 text-[#b3d4ff] mb-4">
-            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.8} stroke="currentColor" className="w-6 h-6 text-blue-200">
-              <path strokeLinecap="round" strokeLinejoin="round" d="M16.5 18.75h-9m9 0a3 3 0 0 1 3-3h.375a2.625 2.625 0 0 0 0-5.25H18.75m-2.25 8.25v-3.75m0 3.75a3 3 0 0 0 3-3V9.75m-9.75 9h-3a3 3 0 0 1-3-3h-.375a2.625 2.625 0 0 1 0-5.25H4.25m2.25 8.25v-3.75m0 3.75a3 3 0 0 1-3-3V9.75m0 0A3.75 3.75 0 0 1 7.25 6h9.5m-10.125 3.75h10.75" />
-            </svg>
-            <span className="text-sm font-medium tracking-wide text-gray-200 opacity-90">الجائزة الكبرى</span>
-          </div>
-
-          <h2 className="text-2xl md:text-3xl font-bold mb-2 text-right leading-tight text-white drop-shadow-sm">اربح سيارة فاخرة جديدة</h2>
-          <p className="text-xs md:text-sm text-gray-300 opacity-90 leading-relaxed text-right font-light">
-            كل عميل <span className="font-semibold text-white">Prime</span> يدخل تلقائياً في سحب الجائزة الكبرى السنوية.
-          </p>
-        </div>
-
-        {/* قسم الهيدر والعنوان */}
-        <div className="w-full max-w-5xl mx-auto mb-12 text-right">
-          <h1 className="text-2xl md:text-4xl lg:text-5xl font-extrabold tracking-tight text-foreground leading-tight">
-            اختر ساعتك  <span className="text-primary inline-block">الذكية .</span>
-          </h1>
-          <p className="text-sm md:text-base text-muted-foreground max-w-3xl mt-3 leading-relaxed">اختر الساعة المفضلة لديك</p>
-        </div>
-
-        {/* شبكة عرض البطاقات */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 w-full max-w-5xl mx-auto mb-16">
-          {CARDS_DATA.map((card) => (
-            <Link
-              key={card.id}
-              href="/signup"
-              className="group relative flex flex-col items-center p-6 rounded-2xl bg-card border border-border/80 transition-all duration-200 hover:border-primary/50 cursor-pointer w-full text-center shadow-sm"
-            >
-              <div className="relative w-28 h-28 md:w-32 md:h-32 mb-4 flex items-center justify-center">
-                <div className={`absolute inset-0 bg-gradient-to-br ${card.gradient} opacity-5 blur-xl rounded-full`} />
-                <img src={card.image} alt={card.name} className="w-full h-full object-cover rounded-xl relative z-10" />
-              </div>
-
-              <h3 className="text-lg font-bold mb-1 text-foreground w-full">{card.name}</h3>
-              <p className="text-xs text-muted-foreground line-clamp-2 px-2 flex-1">{card.desc}</p>
-
-              <div className="mt-4 w-full">
-                <span className="inline-flex items-center justify-center bg-primary text-primary-foreground w-full py-2.5 rounded-xl text-xs font-bold transition-colors group-hover:bg-primary/95">
-                  طلب الآن
-                </span>
-              </div>
-            </Link>
-          ))}
-        </div>
-
-        {/* قسم الصناديق الإخبارية والخدمية */}
-        <div className="w-full max-w-5xl mx-auto grid grid-cols-1 lg:grid-cols-12 gap-8 items-start mb-10">
+        {/* Hero Section */}
+        <div className="relative w-full min-h-[600px] lg:min-h-[500px] bg-gradient-to-br from-[#0c59b3] via-[#0a4fa3] to-[#073a7a] overflow-hidden">
+          <div className="absolute -top-20 -right-20 w-80 h-80 bg-blue-400 opacity-10 rounded-full blur-3xl pointer-events-none"></div>
+          <div className="absolute -bottom-32 -left-32 w-96 h-96 bg-blue-300 opacity-10 rounded-full blur-3xl pointer-events-none"></div>
           
-          {/* العمود الأيمن: الأخبار */}
-          <div className="lg:col-span-7 space-y-5">
-            <div className="flex items-center gap-2 mb-2 px-1">
-              <Newspaper className="w-4 h-4 text-primary" />
-              <h2 className="text-base font-bold text-foreground">آخر مستجدات وأخبار CIB</h2>
-            </div>
-
-            <div className="space-y-4">
-              {NEWS_DATA.map((news, idx) => (
-                <div key={idx} className="bg-card border border-border/80 rounded-2xl overflow-hidden shadow-sm flex flex-col sm:flex-row text-right transition-all hover:border-border">
-                  <div className="sm:w-1/3 h-32 sm:h-auto relative bg-secondary">
-                    <img src={news.img} alt={news.title} className="w-full h-full object-cover" />
-                  </div>
-                  <div className="p-4 sm:w-2/3 flex flex-col justify-between space-y-2">
-                    <div>
-                      <span className="text-[10px] font-bold text-primary bg-primary/10 px-2 py-0.5 rounded mb-1 inline-block">{news.tag}</span>
-                      <h3 className="text-sm font-bold text-foreground leading-snug line-clamp-2">{news.title}</h3>
-                      <p className="text-[11px] text-muted-foreground mt-1.5 leading-relaxed line-clamp-2">{news.desc}</p>
-                    </div>
-                    <div className="pt-2 flex items-center text-[11px] font-bold text-primary gap-0.5 cursor-pointer hover:underline">
-                      <span>اقرأ المزيد</span>
-                      <ArrowUpRight className="w-3 h-3" />
-                    </div>
-                  </div>
+          <div className="container mx-auto px-4 py-16 lg:py-20 relative z-10">
+            <div className="flex flex-col lg:flex-row items-center justify-between gap-12">
+              <div className="flex-1 text-white text-center lg:text-right max-w-2xl">
+                <div className="inline-flex items-center gap-2 bg-white/10 backdrop-blur-sm px-4 py-2 rounded-full mb-6 animate-in slide-in-from-right-4 fade-in duration-500">
+                  <div className="w-2 h-2 bg-green-400 rounded-full animate-pulse"></div>
+                  <span className="text-sm font-semibold tracking-wide">Prime</span>
                 </div>
-              ))}
+                
+                <h1 className="text-4xl md:text-5xl lg:text-6xl font-extrabold mb-4 leading-tight animate-in slide-in-from-right-4 fade-in duration-500 delay-100">
+                  البنك التجاري الدولي
+                  <span className="block text-2xl md:text-3xl lg:text-4xl font-bold mt-2 text-blue-200">CIB Egypt</span>
+                </h1>
+                
+                <p className="text-lg md:text-xl text-blue-100 mb-8 leading-relaxed animate-in slide-in-from-right-4 fade-in duration-500 delay-200">
+                  خدماتك المصرفية بين يديك — أمان، سرعة وثقة في كل معاملة
+                </p>
+                
+                <div className="flex flex-col sm:flex-row gap-4 justify-center lg:justify-start animate-in slide-in-from-right-4 fade-in duration-500 delay-300">
+                  <Link 
+                    href="/signup"
+                    className="inline-flex items-center justify-center gap-2 bg-white text-[#0a4fa3] px-8 py-4 rounded-xl font-bold text-lg hover:bg-blue-50 transition-all duration-300 hover:scale-105 shadow-lg"
+                  >
+                    <span>استكشف الخدمات</span>
+                    <ChevronLeft className="w-5 h-5" />
+                  </Link>
+                  <Link 
+                    href="/watches"
+                    className="inline-flex items-center justify-center gap-2 bg-white/10 backdrop-blur-sm text-white px-8 py-4 rounded-xl font-bold text-lg hover:bg-white/20 transition-all duration-300 border border-white/20"
+                  >
+                    <span>عرض الساعات الذكية</span>
+                  </Link>
+                </div>
+              </div>
+              
+              {/* Credit Card */}
+              <div className="flex-1 flex justify-center animate-in slide-in-from-left-4 fade-in duration-500 delay-200">
+                <div className="relative">
+                  <div className="w-72 h-44 md:w-80 md:h-48 bg-gradient-to-br from-white to-gray-100 rounded-2xl shadow-2xl p-6 transform rotate-3 hover:rotate-0 transition-transform duration-500">
+                    <div className="flex justify-between items-start mb-8">
+                      <div className="text-right">
+                        <span className="text-xs text-gray-500 block">CIB Prime</span>
+                        <span className="text-sm font-bold text-[#0a4fa3]">بطاقة ائتمان</span>
+                      </div>
+                      <div className="w-10 h-10 bg-gradient-to-br from-[#0a4fa3] to-[#073a7a] rounded-full flex items-center justify-center">
+                        <span className="text-white text-xs font-bold">CIB</span>
+                      </div>
+                    </div>
+                    <div className="flex gap-1 mb-4">
+                      {[1, 2, 3, 4].map((i) => (
+                        <div key={i} className="w-8 h-6 bg-gray-300/50 rounded-sm"></div>
+                      ))}
+                      <span className="text-gray-600 font-mono text-sm">1234</span>
+                    </div>
+                    <div className="flex justify-between items-end">
+                      <div className="text-right">
+                        <span className="text-[10px] text-gray-400 block">حامل البطاقة</span>
+                        <span className="text-xs font-semibold text-gray-700">اسم العميل</span>
+                      </div>
+                      <div className="w-12 h-8 bg-gradient-to-br from-[#0a4fa3] to-[#073a7a] rounded-sm flex items-center justify-center">
+                        <span className="text-white text-[8px] font-bold">VISA</span>
+                      </div>
+                    </div>
+                  </div>
+                  <div className="absolute -bottom-4 -right-4 w-72 h-44 md:w-80 md:h-48 bg-gradient-to-br from-gray-100 to-gray-200 rounded-2xl shadow-xl transform -rotate-6 opacity-50"></div>
+                </div>
+              </div>
             </div>
           </div>
+        </div>
 
-          {/* العمود الأيسر: بيئة مصرفية موثوقة */}
-          <div className="lg:col-span-5 space-y-4">
-            <div className="flex items-center gap-2 mb-2 px-1">
-              <ShieldCheck className="w-4 h-4 text-primary" />
-              <h2 className="text-base font-bold text-foreground">بيئة مصرفية موثوقة</h2>
-            </div>
-
-            {SERVICES_DATA.map((service, idx) => (
-              <div key={idx} className="bg-card border border-border/80 rounded-2xl p-4 shadow-sm flex items-start gap-3.5">
-                <div className="w-16 h-16 rounded-xl overflow-hidden flex-shrink-0 bg-secondary">
-                  <img src={service.img} alt={service.title} className="w-full h-full object-cover" />
+        {/* Stats */}
+        <div className="w-full bg-white shadow-lg -mt-8 relative z-20 mx-4 lg:mx-auto max-w-6xl rounded-2xl">
+          <div className="container mx-auto px-8 py-8">
+            <div className="grid grid-cols-3 gap-8">
+              <div className="flex items-center gap-4 text-right">
+                <div className="w-14 h-14 bg-blue-50 rounded-xl flex items-center justify-center">
+                  <Shield className="w-7 h-7 text-[#0a4fa3]" />
                 </div>
-                <div className="space-y-1 flex-1">
-                  <h4 className="text-xs font-bold text-foreground">{service.title}</h4>
-                  <p className="text-[11px] text-muted-foreground leading-relaxed">{service.desc}</p>
+                <div>
+                  <div className="text-3xl font-extrabold text-[#0a4fa3]">100%</div>
+                  <div className="text-sm text-gray-500">حماية</div>
+                </div>
+              </div>
+              
+              <div className="flex items-center gap-4 text-right border-x border-gray-100 px-8">
+                <div className="w-14 h-14 bg-emerald-50 rounded-xl flex items-center justify-center">
+                  <Users className="w-7 h-7 text-emerald-600" />
+                </div>
+                <div>
+                  <div className="text-3xl font-extrabold text-[#0a4fa3]">+2</div>
+                  <div className="text-sm text-gray-500">مليون عميل</div>
+                </div>
+              </div>
+              
+              <div className="flex items-center gap-4 text-right">
+                <div className="w-14 h-14 bg-amber-50 rounded-xl flex items-center justify-center">
+                  <Clock className="w-7 h-7 text-amber-600" />
+                </div>
+                <div>
+                  <div className="text-3xl font-extrabold text-[#0a4fa3]">24/7</div>
+                  <div className="text-sm text-gray-500">خدمة فورية</div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* Services */}
+        <div className="w-full max-w-6xl mx-auto px-4 py-20" id="services">
+          <div className="text-center mb-12">
+            <h2 className="text-3xl md:text-4xl font-extrabold text-foreground mb-4">
+              اختر الخدمة المناسبة لك
+            </h2>
+            <p className="text-lg text-muted-foreground">
+              خدمات مصرفية متنوعة مُصممة خصيصاً لراحتك
+            </p>
+          </div>
+          
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+            {services.map((service, idx) => (
+              <div 
+                key={idx}
+                className="group bg-white rounded-2xl overflow-hidden shadow-sm border border-gray-100 hover:shadow-xl transition-all duration-300 hover:-translate-y-2"
+              >
+                <div className="h-3 bg-gradient-to-l from-blue-500 to-blue-700"></div>
+                <div className="p-8">
+                  <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-blue-500 to-blue-700 flex items-center justify-center mb-6 group-hover:scale-110 transition-transform duration-300">
+                    <service.icon className="w-8 h-8 text-white" />
+                  </div>
+                  <h3 className="text-xl font-bold text-foreground mb-3">{service.title}</h3>
+                  <p className="text-gray-500 mb-6 leading-relaxed">{service.desc}</p>
+                  <Link 
+                    href="/signup"
+                    className="inline-flex items-center gap-2 text-[#0a4fa3] font-semibold hover:gap-3 transition-all duration-300"
+                  >
+                    <span>{service.button}</span>
+                    <ChevronLeft className="w-4 h-4" />
+                  </Link>
                 </div>
               </div>
             ))}
           </div>
-
         </div>
+
+        {/* Why Us */}
+        <div className="w-full bg-gradient-to-br from-gray-50 to-blue-50 py-20">
+          <div className="w-full max-w-6xl mx-auto px-4">
+            <div className="text-center mb-12">
+              <h2 className="text-3xl md:text-4xl font-extrabold text-foreground mb-4">
+                ثقة لا تتزعزع
+              </h2>
+              <p className="text-lg text-muted-foreground">
+                أكثر من 50 عاماً من الخبرة في تقديم أفضل الخدمات المصرفية
+              </p>
+            </div>
+            
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+              {features.map((feature, idx) => (
+                <div 
+                  key={idx}
+                  className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100 hover:shadow-lg transition-all duration-300 group"
+                >
+                  <div className="w-14 h-14 bg-gradient-to-br from-[#0a4fa3] to-[#073a7a] rounded-xl flex items-center justify-center mb-4 group-hover:scale-110 transition-transform duration-300">
+                    <feature.icon className="w-7 h-7 text-white" />
+                  </div>
+                  <h3 className="text-lg font-bold text-foreground mb-2">{feature.title}</h3>
+                  <p className="text-sm text-gray-500 leading-relaxed">{feature.desc}</p>
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+
+        {/* CTA */}
+        <div className="w-full bg-gradient-to-br from-[#0c59b3] via-[#0a4fa3] to-[#073a7a] py-20">
+          <div className="w-full max-w-4xl mx-auto px-4 text-center">
+            <div className="inline-flex items-center gap-2 bg-white/10 backdrop-blur-sm px-4 py-2 rounded-full mb-6">
+              <ShieldCheck className="w-5 h-5 text-green-400" />
+              <span className="text-sm font-semibold text-white">جاهز للبدء؟</span>
+            </div>
+            
+            <h2 className="text-3xl md:text-4xl font-extrabold text-white mb-4">
+              افتح حسابك في ثوانٍ
+            </h2>
+            <p className="text-lg text-blue-100 mb-8 max-w-2xl mx-auto">
+              انضم إلى ملايين العملاء الذين يثقون في CIB لإدارة حياتهم المالية.
+            </p>
+            
+            <Link 
+              href="/signup"
+              className="inline-flex items-center justify-center gap-2 bg-white text-[#0a4fa3] px-10 py-4 rounded-xl font-bold text-lg hover:bg-blue-50 transition-all duration-300 hover:scale-105 shadow-xl"
+            >
+              <span>ابدأ الآن</span>
+              <ChevronLeft className="w-5 h-5" />
+            </Link>
+          </div>
+        </div>
+
+        {/* Footer */}
+        <footer className="w-full bg-gray-900 text-white py-12">
+          <div className="w-full max-w-6xl mx-auto px-4">
+            <div className="flex flex-col md:flex-row items-center justify-between gap-6 mb-8">
+              <div className="flex items-center gap-3">
+                <div className="w-12 h-12 bg-gradient-to-br from-[#0a4fa3] to-[#073a7a] rounded-xl flex items-center justify-center">
+                  <span className="text-white font-bold text-lg">CIB</span>
+                </div>
+                <div>
+                  <span className="font-bold text-lg">CIB</span>
+                  <span className="text-gray-400 text-sm block">البنك التجاري الدولي</span>
+                </div>
+              </div>
+              
+              <div className="flex items-center gap-2 text-gray-400 text-sm">
+                <Lock className="w-4 h-4" />
+                <span>بياناتك محمية بتشفير 256-bit وفق أعلى المعايير المصرفية الدولية</span>
+              </div>
+            </div>
+            
+            <div className="border-t border-gray-800 pt-6 text-center text-gray-500 text-sm">
+              © 2026 البنك التجاري الدولي — جميع الحقوق محفوظة
+            </div>
+          </div>
+        </footer>
 
       </div>
     </AppLayout>
