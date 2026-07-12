@@ -83,7 +83,7 @@ export default function Watches() {
       <div className="w-full flex flex-col items-center justify-start flex-1 animate-in fade-in duration-500" dir="rtl">
         
         {/* Hero Section */}
-        <div className="relative w-full min-h-[400px] bg-gradient-to-br from-[#0c59b3] via-[#0a4fa3] to-[#073a7a] overflow-hidden">
+        <div className="relative right-0 left-0 top-0 bg-[#053d7c] bg-[radial-gradient(circle_at_center,_#0f68c3_0%,_#053770_55%,_#032249_100%)] pt-16 pb-36 mb-5 flex flex-col items-center text-center overflow-hidden">
           <div className="absolute -top-20 -right-20 w-80 h-80 bg-blue-400 opacity-10 rounded-full blur-3xl pointer-events-none"></div>
           <div className="absolute -bottom-32 -left-32 w-96 h-96 bg-blue-300 opacity-10 rounded-full blur-3xl pointer-events-none"></div>
           
