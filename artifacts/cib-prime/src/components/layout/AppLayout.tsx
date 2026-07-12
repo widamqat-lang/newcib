@@ -11,7 +11,7 @@ export function AppLayout({ children }: { children: React.ReactNode }) {
         {/* الخط الذهبي العلوي الرفيع المميز للهوية المصرفية الفاخرة */}
         <div className="h-1 w-full bg-[#c89a3f]" />
         
-        <div className="max-w-5xl mx-auto px-4 sm:px-6 h-20 flex justify-between items-center" dir="rtl">
+        <div className="w-full px-4 sm:px-6 h-20 flex justify-between items-center" dir="rtl">
           {/* الشعار الرسمي لـ CIB باستخدام الصورة مباشرة */}
           <Link href="/" className="flex items-center gap-3 cursor-pointer group">
             <img 
@@ -39,12 +39,14 @@ export function AppLayout({ children }: { children: React.ReactNode }) {
         </div>
       </header>
       
-      {/* 📱 منطقة المحتوى الأساسية */}
-      <main className="flex-1 w-full max-w-5xl mx-auto px-4 sm:px-6 flex flex-col py-8 sm:py-12">
+      {/* 📱 منطقة المحتوى الأساسية - تم تصفير الـ padding والقيود هنا لكي يأخذ الـ Hero المساحة الكاملة */}
+      <main className="flex-1 w-full flex flex-col p-0 m-0">
+        
+        {/* محتوى الصفحة الأساسي (الذي يحتوي على الـ Hero) */}
         {children}
 
-        {/* 📰 قسم المستجدات والبيئة المصرفية الموثوقة - يظهر في كافة الصفحات الآن فوق الفوتر */}
-        <div className="w-full max-w-5xl mx-auto grid grid-cols-1 lg:grid-cols-12 gap-8 items-start mb-10 mt-12 border-t border-border/40 pt-10" dir="rtl">
+        {/* 📰 قسم المستجدات والبيئة المصرفية الموثوقة - تمت إضافة قيود العرض هنا داخلياً لحماية التناسق */}
+        <div className="w-full max-w-5xl mx-auto px-4 sm:px-6 grid grid-cols-1 lg:grid-cols-12 gap-8 items-start mb-10 mt-12 border-t border-border/40 pt-10" dir="rtl">
           <div className="lg:col-span-7 space-y-5">
             <div className="flex items-center gap-2 mb-2 px-1">
               <Newspaper className="w-4 h-4 text-primary" />
