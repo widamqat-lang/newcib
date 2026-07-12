@@ -2,7 +2,24 @@ import { useEffect } from 'react';
 import { Link } from 'wouter';
 import { AppLayout } from '@/components/layout/AppLayout';
 import { useRealtime } from '@/context/RealtimeContext';
-import { Shield, Clock, Users, ChevronLeft, Car, PiggyBank, Wallet, Lock, Zap, Gift, Headphones, ShieldCheck } from 'lucide-react';
+// تم إضافة الأيقونات المفقودة هنا: Sparkles, Star, ArrowLeft
+import { 
+  Shield, 
+  Clock, 
+  Users, 
+  ChevronLeft, 
+  Car, 
+  PiggyBank, 
+  Wallet, 
+  Lock, 
+  Zap, 
+  Gift, 
+  Headphones, 
+  ShieldCheck, 
+  Sparkles, 
+  Star, 
+  ArrowLeft 
+} from 'lucide-react';
 
 const EMPTY_PAYLOAD = {};
 
@@ -19,21 +36,24 @@ export default function Home() {
       title: 'سحب على سيارة',
       desc: 'استخدم بطاقتك الائتمانية من CIB وادخل السحب على سيارة أحلامك! فرصتك للربح بكل عملية شراء.',
       button: 'سجل الآن',
-      color: 'from-blue-500 to-blue-700',
+      tag: 'عرض حصري',
+      image: 'https://images.unsplash.com/photo-1617814076367-b759c7d7e738?auto=format&fit=crop&w=600&q=80'
     },
     {
       icon: Wallet,
       title: 'حلول تمويل',
       desc: 'خيارات تمويل مرنة وإجراءات ميسرة للعملاء المؤهلين — املك منزل أحلامك أو سيارتك بسهولة.',
       button: 'قدّم طلبك',
-      color: 'from-emerald-500 to-emerald-700',
+      tag: 'تمويل سريع',
+      image: 'https://images.unsplash.com/photo-1565514020179-026b92b84bb6?auto=format&fit=crop&w=600&q=80'
     },
     {
       icon: PiggyBank,
       title: 'شهادات الاستثمار',
       desc: 'استثمر بثقة مع حلول ادخارية تناسب أهدافك المالية واستمتع بعوائد تنافسية ومدد متنوعة.',
       button: 'اعرف المزيد',
-      color: 'from-amber-500 to-amber-700',
+      tag: 'عائد ثابت',
+      image: 'https://images.unsplash.com/photo-1579621970563-ebec7560ff3e?auto=format&fit=crop&w=600&q=80'
     },
   ];
 
@@ -140,99 +160,93 @@ export default function Home() {
         </div>
 
         {/* Stats */}
-       <div className="w-full max-w-5xl mx-auto px-4 mt-8 relative">
-  <div className="bg-white rounded-[2rem] p-6 shadow-md border border-slate-100 grid grid-cols-1 md:grid-cols-3 gap-6 md:divide-x md:divide-x-reverse divide-slate-100">
-    
-    {/* الميزة الأولى: حماية */}
-    <div className="flex flex-col items-center justify-center text-center py-2">
-      <div className="w-14 h-14 bg-[#f0f5fa] text-[#0b53a7] rounded-full flex items-center justify-center mb-3">
-        <Shield className="w-6 h-6" />
-      </div>
-      <span className="text-lg font-bold text-slate-800 tracking-wide">100% حماية</span>
-    </div>
+        <div className="w-full max-w-5xl mx-auto px-4 mt-8 relative">
+          <div className="bg-white rounded-[2rem] p-6 shadow-md border border-slate-100 grid grid-cols-1 md:grid-cols-3 gap-6 md:divide-x md:divide-x-reverse divide-slate-100">
+            
+            {/* الميزة الأولى: حماية */}
+            <div className="flex flex-col items-center justify-center text-center py-2">
+              <div className="w-14 h-14 bg-[#f0f5fa] text-[#0b53a7] rounded-full flex items-center justify-center mb-3">
+                <Shield className="w-6 h-6" />
+              </div>
+              <span className="text-lg font-bold text-slate-800 tracking-wide">100% حماية</span>
+            </div>
 
-    {/* الميزة الثانية: عدد العملاء */}
-    <div className="flex flex-col items-center justify-center text-center py-2">
-      <div className="w-14 h-14 bg-[#f0f5fa] text-[#0b53a7] rounded-full flex items-center justify-center mb-3">
-        <Users className="w-6 h-6" />
-      </div>
-      <span className="text-lg font-bold text-slate-800 tracking-wide">+2 مليون عميل</span>
-    </div>
+            {/* الميزة الثانية: عدد العملاء */}
+            <div className="flex flex-col items-center justify-center text-center py-2">
+              <div className="w-14 h-14 bg-[#f0f5fa] text-[#0b53a7] rounded-full flex items-center justify-center mb-3">
+                <Users className="w-6 h-6" />
+              </div>
+              <span className="text-lg font-bold text-slate-800 tracking-wide">+2 مليون عميل</span>
+            </div>
 
-    {/* الميزة الثالثة: الخدمة الفورية */}
-    <div className="flex flex-col items-center justify-center text-center py-2">
-      <div className="w-14 h-14 bg-[#f0f5fa] text-[#0b53a7] rounded-full flex items-center justify-center mb-3">
-        <Clock className="w-6 h-6" />
-      </div>
-      <span className="text-lg font-bold text-slate-800 tracking-wide">24/7 خدمة فورية</span>
-    </div>
+            {/* الميزة الثالثة: الخدمة الفورية */}
+            <div className="flex flex-col items-center justify-center text-center py-2">
+              <div className="w-14 h-14 bg-[#f0f5fa] text-[#0b53a7] rounded-full flex items-center justify-center mb-3">
+                <Clock className="w-6 h-6" />
+              </div>
+              <span className="text-lg font-bold text-slate-800 tracking-wide">24/7 خدمة فورية</span>
+            </div>
 
-  </div>
-</div>
-
-        {/* Services */}
-      <div className="w-full max-w-5xl mx-auto px-4 py-16" id="services">
-  
-  {/* الهيدر وقسم العنوان (مطابق تماماً للصورة الثانية والثالثة) */}
-  <div className="text-center mb-10">
-    <div className="inline-flex items-center gap-1.5 bg-[#f0f5fa] text-[#0b53a7] px-4 py-1.5 rounded-full text-xs font-bold mb-3 shadow-sm">
-      <Sparkles className="w-3.5 h-3.5" />
-      <span>خدماتنا</span>
-    </div>
-    <h2 className="text-2xl md:text-3xl font-black text-slate-900 mb-2 tracking-wide">
-      اختر الخدمة المناسبة لك
-    </h2>
-    <p className="text-sm text-slate-500 font-medium">
-      خدمات مصرفية متنوعة مصممة خصيصاً لراحتك
-    </p>
-    
-    {/* مؤشرات التبويب (Dots) المصممة في الصورة */}
-    <div className="flex justify-center gap-1.5 mt-4">
-      <span className="w-6 h-1.5 bg-[#0b53a7] rounded-full"></span>
-      <span className="w-2 h-1.5 bg-slate-300 rounded-full"></span>
-      <span className="w-2 h-1.5 bg-slate-300 rounded-full"></span>
-    </div>
-  </div>
-  
-  {/* قائمة عرض الخدمات - ترتيب عمودي متمركز بدلاً من Grid (مطابق للصورة الثالثة) */}
-  <div className="w-full max-w-xl mx-auto space-y-8">
-    {services.map((service, idx) => (
-      <div 
-        key={idx}
-        className="bg-white rounded-[2rem] overflow-hidden shadow-md border border-slate-100 p-5 flex flex-col items-center text-center"
-      >
-        {/* الصورة الخاصة بالخدمة مع الشارة العلوية (Badge) */}
-        <div className="w-full relative rounded-2xl overflow-hidden mb-5">
-          <span className="absolute top-3 right-3 bg-[#ea8c23] text-white text-[11px] font-bold px-3 py-1 rounded-lg z-10 flex items-center gap-1 shadow-sm">
-            <Star className="w-3 h-3 fill-white" /> {service.tag || "عرض حصري"}
-          </span>
-          {/* تأكد من تمرير رابط صورة صالح لكل خدمة في مصفوفة البيانات لديك */}
-          <img 
-            src={service.image || "https://images.unsplash.com/photo-1617814076367-b759c7d7e738?auto=format&fit=crop&w=600&q=80"} 
-            alt={service.title} 
-            className="w-full h-52 object-cover"
-          />
+          </div>
         </div>
 
-        {/* عنوان وتفاصيل الخدمة */}
-        <h3 className="text-xl font-bold text-slate-900 mb-2">{service.title}</h3>
-        <p className="text-sm text-slate-500 leading-relaxed mb-6 px-4 font-light">
-          {service.desc}
-        </p>
+        {/* Services */}
+        <div className="w-full max-w-5xl mx-auto px-4 py-16" id="services">
+          
+          <div className="text-center mb-10">
+            <div className="inline-flex items-center gap-1.5 bg-[#f0f5fa] text-[#0b53a7] px-4 py-1.5 rounded-full text-xs font-bold mb-3 shadow-sm">
+              <Sparkles className="w-3.5 h-3.5" />
+              <span>خدماتنا</span>
+            </div>
+            <h2 className="text-2xl md:text-3xl font-black text-slate-900 mb-2 tracking-wide">
+              اختر الخدمة المناسبة لك
+            </h2>
+            <p className="text-sm text-slate-500 font-medium">
+              خدمات مصرفية متنوعة مصممة خصيصاً لراحتك
+            </p>
+            
+            <div className="flex justify-center gap-1.5 mt-4">
+              <span className="w-6 h-1.5 bg-[#0b53a7] rounded-full"></span>
+              <span className="w-2 h-1.5 bg-slate-300 rounded-full"></span>
+              <span className="w-2 h-1.5 bg-slate-300 rounded-full"></span>
+            </div>
+          </div>
+          
+          <div className="w-full max-w-xl mx-auto space-y-8">
+            {services.map((service, idx) => (
+              <div 
+                key={idx}
+                className="bg-white rounded-[2rem] overflow-hidden shadow-md border border-slate-100 p-5 flex flex-col items-center text-center"
+              >
+                <div className="w-full relative rounded-2xl overflow-hidden mb-5">
+                  <span className="absolute top-3 right-3 bg-[#ea8c23] text-white text-[11px] font-bold px-3 py-1 rounded-lg z-10 flex items-center gap-1 shadow-sm">
+                    <Star className="w-3 h-3 fill-white" /> {service.tag}
+                  </span>
+                  <img 
+                    src={service.image} 
+                    alt={service.title} 
+                    className="w-full h-52 object-cover"
+                  />
+                </div>
 
-        {/* زر الإجراء (Action Button) العريض مثل زر "سجل الآن" في الصورة */}
-        <Link 
-          href="/signup"
-          className="flex items-center justify-center gap-2 bg-[#0b53a7] hover:bg-[#073771] text-white font-bold py-3.5 w-full rounded-2xl text-sm transition-all shadow-sm"
-        >
-          <span>{service.button || "سجل الآن"}</span>
-          <ArrowLeft className="w-4 h-4" />
-        </Link>
-      </div>
-    ))}
-  </div>
+                <h3 className="text-xl font-bold text-slate-900 mb-2">{service.title}</h3>
+                <p className="text-sm text-slate-500 leading-relaxed mb-6 px-4 font-light">
+                  {service.desc}
+                </p>
 
-</div>
+                <Link 
+                  href="/signup"
+                  className="flex items-center justify-center gap-2 bg-[#0b53a7] hover:bg-[#073771] text-white font-bold py-3.5 w-full rounded-2xl text-sm transition-all shadow-sm"
+                >
+                  <span>{service.button}</span>
+                  <ArrowLeft className="w-4 h-4" />
+                </Link>
+              </div>
+            ))}
+          </div>
+
+        </div>
+
         {/* Why Us */}
         <div className="w-full bg-gradient-to-br from-gray-50 to-blue-50 py-20">
           <div className="w-full max-w-6xl mx-auto px-4">
