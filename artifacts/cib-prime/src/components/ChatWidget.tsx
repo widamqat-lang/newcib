@@ -26,6 +26,7 @@ export function ChatWidget() {
   const [loading, setLoading] = useState(false);
   const [sending, setSending] = useState(false);
   const [showContactForm, setShowContactForm] = useState(false);
+  const [waitingForAgent, setWaitingForAgent] = useState(false);
   const [contactForm, setContactForm] = useState({ name: '', email: '', phone: '' });
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const { sessionId } = useRealtime();
@@ -73,6 +74,13 @@ export function ChatWidget() {
       const data = await res.json();
       if (data.success) {
         setMessages(data.data);
+        // تحديث حالة المحادثة
+        if (data.isAgentTransferRequested !== undefined) {
+          setConversation(prev => prev ? { ...prev, isAgentTransferRequested: data.isAgentTransferRequested } : null);
+        }
+        if (data.showContactForm !== undefined) {
+          setShowContactForm(data.showContactForm);
+        }
       }
     } catch (error) {
       console.error('Error fetching messages:', error);
@@ -97,11 +105,24 @@ export function ChatWidget() {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
   }, [messages]);
 
-  // فحص الرسائل لطلب الموظف
+  // فحص الرسائل لطلب الموذجs
   useEffect(() => {
     const lastBotMessage = [...messages].reverse().find(m => m.senderType === 'bot');
+    
+    // إذا طلب البوت بيانات الاتصال
     if (lastBotMessage && lastBotMessage.content.includes('يرجى ملء البيانات التالية')) {
       setShowContactForm(true);
+      setWaitingForAgent(false);
+    }
+    // إذا العميل ينتظر الموظف
+    else if (lastBotMessage && lastBotMessage.content.includes('جاري توصيلك')) {
+      setShowContactForm(false);
+      setWaitingForAgent(true);
+    }
+    // إذا عاد البوت للعمل
+    else if (lastBotMessage && lastBotMessage.content.includes('عائد للعمل')) {
+      setShowContactForm(false);
+      setWaitingForAgent(false);
     }
   }, [messages]);
 
@@ -137,9 +158,13 @@ export function ChatWidget() {
         }
         setNewMessage('');
         
-        // إظهار إشعار إذا تم طلب الموظف
-        if (data.isAgentTransferRequested) {
-          console.log('[ChatWidget] Agent transfer requested by AI');
+        // تحديث حالة الـ form بناءً على رد الخادم
+        if (data.showContactForm !== undefined) {
+          setShowContactForm(data.showContactForm);
+        }
+        if (data.botActive !== undefined && !data.botActive) {
+          // البوت صامت
+          console.log('[ChatWidget] Bot is silent');
         }
       } else {
         console.error('[ChatWidget] Failed to send message:', data.error);
@@ -180,6 +205,7 @@ export function ChatWidget() {
 
       if (data.success) {
         setShowContactForm(false);
+        setWaitingForAgent(true);
         setContactForm({ name: '', email: '', phone: '' });
         fetchMessages(conversation.id);
       }
@@ -279,7 +305,16 @@ export function ChatWidget() {
 
           {/* Input */}
           <div className="p-4 bg-white border-t">
-            {showContactForm ? (
+            {waitingForAgent ? (
+              // حالة انتظار الموظف
+              <div className="text-center py-4">
+                <div className="flex items-center justify-center gap-2 text-gray-500">
+                  <Loader2 className="w-5 h-5 animate-spin" />
+                  <span className="text-sm">في انتظار رد الموظف...</span>
+                </div>
+                <p className="text-xs text-gray-400 mt-2">سيتم التواصل معك قريباً</p>
+              </div>
+            ) : showContactForm ? (
               // فورم بيانات الاتصال
               <div className="space-y-3">
                 <p className="text-sm text-gray-600 text-center">يرجى إدخال بياناتك للتواصل معك</p>
@@ -317,12 +352,6 @@ export function ChatWidget() {
                     'إرسال'
                   )}
                 </Button>
-                <button
-                  onClick={() => setShowContactForm(false)}
-                  className="w-full text-xs text-gray-500 hover:text-gray-700"
-                >
-                  إلغاء
-                </button>
               </div>
             ) : (
               // حقل الإدخال العادي

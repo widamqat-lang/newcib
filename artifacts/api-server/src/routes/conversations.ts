@@ -319,7 +319,8 @@ router.post("/:id/messages", async (req, res) => {
         success: true, 
         data: updatedMessages,
         isAgentTransferRequested: aiResult.requestAgentTransfer,
-        botActive: aiResult.reactivateBot || !aiResult.requestAgentTransfer
+        botActive: aiResult.reactivateBot || !aiResult.requestAgentTransfer,
+        showContactForm: aiResult.showContactForm
       });
       return;
     }
@@ -370,7 +371,7 @@ router.post("/:id/contact", async (req, res) => {
     await db.insert(messagesTable).values({
       conversationId,
       senderType: "bot",
-      content: `✅ تم استلام بياناتك بنجاح!\n\n📝 الاسم: ${name}\n📧 البريد: ${email || 'غير محدد'}\n📱 الموبايل: ${phone}\n\nسيتواصل معك أحد ممثلي خدمة العملاء قريباً. شكراً لتواصلك معنا! 🙏`,
+      content: `✅ تم استلام بياناتك بنجاح!\n\n📝 الاسم: ${name}\n📧 البريد: ${email || 'غير محدد'}\n📱 الموبايل: ${phone}\n\n⏳ جاري توصيلك بأحد ممثلي خدمة العملاء...\n\nيرجى الانتظار، سيتواصل معك الموظف قريباً. 🙏`,
     });
 
     // إشعار المدراء عبر WebSocket
@@ -386,6 +387,8 @@ router.post("/:id/contact", async (req, res) => {
     res.json({ 
       success: true, 
       message: "تم حفظ بيانات الاتصال",
+      botActive: false, // صمت الـ bot
+      waitingForAgent: true,
       data: { name, email, phone }
     });
   } catch (error: any) {
