@@ -1,5 +1,5 @@
 import { Router } from "express";
-import { eq, desc, and } from "drizzle-orm";
+import { eq, desc, and, sql } from "drizzle-orm";
 import { db, conversationsTable, messagesTable, clientSessionsTable, conversationSummariesTable } from "@workspace/db";
 import { LocalAI } from "../lib/localAI";
 
@@ -203,7 +203,7 @@ router.post("/:id/messages", async (req, res) => {
       .update(conversationsTable)
       .set({ 
         updatedAt: new Date(),
-        messageCount: db.raw(`message_count + 1`)
+        messageCount: sql`message_count + 1`
       })
       .where(eq(conversationsTable.id, conversationId));
 
