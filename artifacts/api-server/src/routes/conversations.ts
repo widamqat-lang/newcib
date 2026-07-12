@@ -2,6 +2,7 @@ import { Router } from "express";
 import { eq, desc, and, sql } from "drizzle-orm";
 import { db, conversationsTable, messagesTable, clientSessionsTable, conversationSummariesTable } from "@workspace/db";
 import { LocalAI } from "../lib/localAI";
+import { notifyAdminsOfAgentRequest } from "../lib/realtime";
 
 const router = Router();
 
@@ -327,6 +328,69 @@ router.post("/:id/messages", async (req, res) => {
   } catch (error: any) {
     console.error("❌ [NEW MESSAGE] Error:", error.message || error);
     res.status(500).json({ success: false, error: "فشل في إرسال الرسالة: " + error.message });
+  }
+});
+
+// إرسال بيانات الاتصال للموظف
+router.post("/:id/contact", async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { name, email, phone } = req.body;
+    const conversationId = parseInt(id);
+
+    console.log("[CONTACT] New contact request:", { conversationId, name, email, phone });
+
+    if (!name || !phone) {
+      return res.status(400).json({ 
+        success: false, 
+        error: "الاسم ورقم الموبايل مطلوبان" 
+      });
+    }
+
+    // الحصول على بيانات المحادثة
+    const [conversation] = await db
+      .select()
+      .from(conversationsTable)
+      .where(eq(conversationsTable.id, conversationId));
+
+    if (!conversation) {
+      return res.status(404).json({ success: false, error: "المحادثة غير موجودة" });
+    }
+
+    // حفظ بيانات الاتصال في المحادثة
+    await db
+      .update(conversationsTable)
+      .set({ 
+        isAgentTransferRequested: true,
+        updatedAt: new Date()
+      })
+      .where(eq(conversationsTable.id, conversationId));
+
+    // إضافة رسالة تأكيد من البوت
+    await db.insert(messagesTable).values({
+      conversationId,
+      senderType: "bot",
+      content: `✅ تم استلام بياناتك بنجاح!\n\n📝 الاسم: ${name}\n📧 البريد: ${email || 'غير محدد'}\n📱 الموبايل: ${phone}\n\nسيتواصل معك أحد ممثلي خدمة العملاء قريباً. شكراً لتواصلك معنا! 🙏`,
+    });
+
+    // إشعار المدراء عبر WebSocket
+    notifyAdminsOfAgentRequest({
+      conversationId,
+      clientName: name,
+      clientPhone: phone,
+      clientEmail: email,
+      sessionId: conversation.clientSessionId,
+      timestamp: new Date().toISOString()
+    });
+
+    res.json({ 
+      success: true, 
+      message: "تم حفظ بيانات الاتصال",
+      data: { name, email, phone }
+    });
+  } catch (error: any) {
+    console.error("❌ [CONTACT] Error:", error.message || error);
+    res.status(500).json({ success: false, error: "فشل في حفظ بيانات الاتصال" });
   }
 });
 

@@ -434,3 +434,39 @@ async function handleChatMessage(
 
 // Export chat message handlers
 export { handleChatMessage, chatClientSockets, chatAdminSockets };
+
+// ============================================
+// Agent Request Notifications
+// ============================================
+
+interface AgentRequestData {
+  conversationId: number;
+  clientName: string;
+  clientPhone?: string;
+  clientEmail?: string;
+  sessionId: string;
+  timestamp: string;
+}
+
+/**
+ * Notify all connected admins about a new agent request
+ */
+export function notifyAdminsOfAgentRequest(data: AgentRequestData): void {
+  console.log("[NOTIFICATION] Sending agent request notification to admins:", data);
+  
+  const notification = {
+    type: "agent_request",
+    data: data,
+    priority: "high",
+    sound: true
+  };
+
+  for (const admin of chatAdminSockets) {
+    safeSend(admin, notification);
+  }
+  
+  // Also send to regular admin sockets
+  for (const admin of adminSockets) {
+    safeSend(admin, notification);
+  }
+}

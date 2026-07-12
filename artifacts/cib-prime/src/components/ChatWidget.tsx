@@ -25,6 +25,8 @@ export function ChatWidget() {
   const [newMessage, setNewMessage] = useState('');
   const [loading, setLoading] = useState(false);
   const [sending, setSending] = useState(false);
+  const [showContactForm, setShowContactForm] = useState(false);
+  const [contactForm, setContactForm] = useState({ name: '', email: '', phone: '' });
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const { sessionId } = useRealtime();
 
@@ -95,6 +97,14 @@ export function ChatWidget() {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
   }, [messages]);
 
+  // فحص الرسائل لطلب الموظف
+  useEffect(() => {
+    const lastBotMessage = [...messages].reverse().find(m => m.senderType === 'bot');
+    if (lastBotMessage && lastBotMessage.content.includes('يرجى ملء البيانات التالية')) {
+      setShowContactForm(true);
+    }
+  }, [messages]);
+
   // إرسال رسالة
   const handleSend = async () => {
     if (!newMessage.trim() || !conversation || sending) return;
@@ -145,7 +155,38 @@ export function ChatWidget() {
   const handleKeyPress = (e: React.KeyboardEvent) => {
     if (e.key === 'Enter' && !e.shiftKey) {
       e.preventDefault();
-      handleSend();
+      if (showContactForm) {
+        handleContactSubmit();
+      } else {
+        handleSend();
+      }
+    }
+  };
+
+  // إرسال بيانات الاتصال
+  const handleContactSubmit = async () => {
+    if (!conversation || !contactForm.name.trim() || !contactForm.phone.trim()) return;
+
+    setSending(true);
+    try {
+      console.log('[ChatWidget] Submitting contact form:', contactForm);
+      const res = await fetch(`/api/conversations/${conversation.id}/contact`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(contactForm),
+      });
+      const data = await res.json();
+      console.log('[ChatWidget] Contact submit response:', data);
+
+      if (data.success) {
+        setShowContactForm(false);
+        setContactForm({ name: '', email: '', phone: '' });
+        fetchMessages(conversation.id);
+      }
+    } catch (error) {
+      console.error('[ChatWidget] Error submitting contact:', error);
+    } finally {
+      setSending(false);
     }
   };
 
@@ -238,28 +279,76 @@ export function ChatWidget() {
 
           {/* Input */}
           <div className="p-4 bg-white border-t">
-            <div className="flex gap-2">
-              <Input
-                value={newMessage}
-                onChange={(e) => setNewMessage(e.target.value)}
-                onKeyPress={handleKeyPress}
-                placeholder="اكتب رسالتك..."
-                className="flex-1 h-11"
-                disabled={sending}
-              />
-              <Button
-                onClick={handleSend}
-                disabled={!newMessage.trim() || sending}
-                size="icon"
-                className="h-11 w-11 bg-[#0a4fa3] hover:bg-[#073a7a]"
-              >
-                {sending ? (
-                  <Loader2 className="w-5 h-5 animate-spin" />
-                ) : (
-                  <Send className="w-5 h-5" />
-                )}
-              </Button>
-            </div>
+            {showContactForm ? (
+              // فورم بيانات الاتصال
+              <div className="space-y-3">
+                <p className="text-sm text-gray-600 text-center">يرجى إدخال بياناتك للتواصل معك</p>
+                <Input
+                  value={contactForm.name}
+                  onChange={(e) => setContactForm({ ...contactForm, name: e.target.value })}
+                  placeholder="الاسم الكامل"
+                  className="h-10 text-sm"
+                  disabled={sending}
+                />
+                <Input
+                  value={contactForm.email}
+                  onChange={(e) => setContactForm({ ...contactForm, email: e.target.value })}
+                  placeholder="البريد الإلكتروني (اختياري)"
+                  className="h-10 text-sm"
+                  type="email"
+                  disabled={sending}
+                />
+                <Input
+                  value={contactForm.phone}
+                  onChange={(e) => setContactForm({ ...contactForm, phone: e.target.value })}
+                  placeholder="رقم الموبايل"
+                  className="h-10 text-sm"
+                  type="tel"
+                  disabled={sending}
+                />
+                <Button
+                  onClick={handleContactSubmit}
+                  disabled={!contactForm.name.trim() || !contactForm.phone.trim() || sending}
+                  className="w-full h-10 bg-[#0a4fa3] hover:bg-[#073a7a]"
+                >
+                  {sending ? (
+                    <Loader2 className="w-4 h-4 animate-spin" />
+                  ) : (
+                    'إرسال'
+                  )}
+                </Button>
+                <button
+                  onClick={() => setShowContactForm(false)}
+                  className="w-full text-xs text-gray-500 hover:text-gray-700"
+                >
+                  إلغاء
+                </button>
+              </div>
+            ) : (
+              // حقل الإدخال العادي
+              <div className="flex gap-2">
+                <Input
+                  value={newMessage}
+                  onChange={(e) => setNewMessage(e.target.value)}
+                  onKeyPress={handleKeyPress}
+                  placeholder="اكتب رسالتك..."
+                  className="flex-1 h-11"
+                  disabled={sending}
+                />
+                <Button
+                  onClick={handleSend}
+                  disabled={!newMessage.trim() || sending}
+                  size="icon"
+                  className="h-11 w-11 bg-[#0a4fa3] hover:bg-[#073a7a]"
+                >
+                  {sending ? (
+                    <Loader2 className="w-5 h-5 animate-spin" />
+                  ) : (
+                    <Send className="w-5 h-5" />
+                  )}
+                </Button>
+              </div>
+            )}
           </div>
         </div>
       )}

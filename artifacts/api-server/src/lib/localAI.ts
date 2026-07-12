@@ -219,6 +219,7 @@ interface SmartReplyOptions {
 function generateSmartReply(options: SmartReplyOptions): { 
   reply: string; 
   requestAgentTransfer: boolean;
+  showContactForm: boolean;
   reactivateBot: boolean;
   context: string;
 } {
@@ -228,8 +229,9 @@ function generateSmartReply(options: SmartReplyOptions): {
   // 1️⃣ فحص طلب الموظف أولاً
   if (checkAgentRequest(message)) {
     return {
-      reply: "✅ تم تسجيل طلبك! سيتم توصيلك بأحد ممثلي خدمة العملاء قريباً.\n\nفي هذه الأثناء، يمكنني مساعدتك في:\n• الاستفسارات العامة\n• خطوات التفعيل\n• معلومات عن الساعات\n\nاضغط على الزر أدناه لبدء المحادثة:",
+      reply: "سأقوم بتوجيهك لأحد ممثلي خدمة العملاء.\n\nيرجى ملء البيانات التالية للتواصل معك:\n\n📝 الاسم الكامل\n📧 البريد الإلكتروني\n📱 رقم الموبايل",
       requestAgentTransfer: true,
+      showContactForm: true,
       reactivateBot: false,
       context: "AGENT_REQUEST"
     };

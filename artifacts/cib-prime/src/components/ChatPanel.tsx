@@ -46,7 +46,67 @@ export function ChatPanel({ isOpen, onClose, isAdminConnected }: ChatPanelProps)
   const [sending, setSending] = useState(false);
   const [showDataDialog, setShowDataDialog] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
+  const [notifications, setNotifications] = useState<any[]>([]);
+  const [showNotifications, setShowNotifications] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
+  const audioRef = useRef<HTMLAudioElement | null>(null);
+
+  // طلب إذن الإشعارات عند تحميل المكون
+  useEffect(() => {
+    if ('Notification' in window && Notification.permission === 'default') {
+      Notification.requestPermission();
+    }
+  }, []);
+
+  // إنشاء صوت الإشعار
+  useEffect(() => {
+    // إنشاء Audio context للصوت
+    const playNotificationSound = () => {
+      try {
+        const audioContext = new (window.AudioContext || (window as any).webkitAudioContext)();
+        const oscillator = audioContext.createOscillator();
+        const gainNode = audioContext.createGain();
+        
+        oscillator.connect(gainNode);
+        gainNode.connect(audioContext.destination);
+        
+        oscillator.frequency.value = 800;
+        oscillator.type = 'sine';
+        gainNode.gain.setValueAtTime(0.3, audioContext.currentTime);
+        gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.5);
+        
+        oscillator.start(audioContext.currentTime);
+        oscillator.stop(audioContext.currentTime + 0.5);
+      } catch (e) {
+        console.log('Audio not supported');
+      }
+    };
+
+    // الاستماع للإشعارات من WebSocket
+    const ws = new WebSocket(`${window.location.protocol === 'https:' ? 'wss:' : 'ws:'}//${window.location.host}/api/ws`);
+    ws.onmessage = (event) => {
+      try {
+        const data = JSON.parse(event.data);
+        if (data.type === 'agent_request') {
+          setNotifications(prev => [data.data, ...prev]);
+          playNotificationSound();
+          // إظهار إشعار المتصفح
+          if (Notification.permission === 'granted') {
+            new Notification('طلب تواصل جديد', {
+              body: `العميل: ${data.data.clientName}\nالهاتف: ${data.data.clientPhone || 'غير متوفر'}`,
+              icon: '/favicon.ico'
+            });
+          }
+        }
+      } catch (e) {}
+    };
+
+    ws.onopen = () => {
+      ws.send(JSON.stringify({ type: 'chat_admin_hello' }));
+    };
+
+    return () => ws.close();
+  }, []);
 
   // جلب المحادثات
   const fetchConversations = async () => {
@@ -214,6 +274,18 @@ export function ChatPanel({ isOpen, onClose, isAdminConnected }: ChatPanelProps)
               {isAdminConnected ? 'متصل' : 'غير متصل'}
             </p>
           </div>
+          {/* زر الإشعارات */}
+          <button
+            onClick={() => setShowNotifications(!showNotifications)}
+            className="relative p-2 hover:bg-white/20 rounded-lg transition-colors"
+          >
+            <Phone className="w-5 h-5 text-white" />
+            {notifications.length > 0 && (
+              <span className="absolute -top-1 -right-1 w-5 h-5 bg-red-500 text-white text-xs rounded-full flex items-center justify-center animate-pulse">
+                {notifications.length}
+              </span>
+            )}
+          </button>
           <button
             onClick={onClose}
             className="p-2 hover:bg-white/20 rounded-lg transition-colors"
@@ -221,6 +293,43 @@ export function ChatPanel({ isOpen, onClose, isAdminConnected }: ChatPanelProps)
             <X className="w-5 h-5 text-white" />
           </button>
         </div>
+
+        {/* قائمة الإشعارات */}
+        {showNotifications && (
+          <div className="bg-yellow-50 border-b border-yellow-200 p-3 max-h-48 overflow-y-auto">
+            <h4 className="font-bold text-yellow-800 mb-2">طلبات التواصل مع الموظف</h4>
+            {notifications.length === 0 ? (
+              <p className="text-sm text-yellow-700">لا توجد طلبات جديدة</p>
+            ) : (
+              <div className="space-y-2">
+                {notifications.map((notif, index) => (
+                  <div 
+                    key={index}
+                    className="bg-white p-3 rounded-lg shadow-sm border border-yellow-200 cursor-pointer hover:bg-yellow-100"
+                    onClick={() => {
+                      // البحث عن المحادثة وفتحها
+                      const conv = conversations.find(c => c.clientSessionId === notif.sessionId);
+                      if (conv) {
+                        setSelectedConversation(conv);
+                        fetchMessages(conv.id);
+                      }
+                      setShowNotifications(false);
+                    }}
+                  >
+                    <p className="font-semibold text-gray-800">{notif.clientName}</p>
+                    <p className="text-sm text-gray-600">
+                      {notif.clientPhone && `📱 ${notif.clientPhone}`}
+                      {notif.clientEmail && ` | 📧 ${notif.clientEmail}`}
+                    </p>
+                    <p className="text-xs text-gray-400">
+                      {new Date(notif.timestamp).toLocaleTimeString('ar-EG')}
+                    </p>
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
+        )}
 
         <div className="flex-1 flex overflow-hidden">
           {/* قائمة المحادثات */}
