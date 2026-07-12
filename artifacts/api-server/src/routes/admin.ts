@@ -113,8 +113,9 @@ router.get("/watches", async (req, res) => {
     console.log(`✅ [WATCHES] Query executed, found ${result.length} watches`);
     console.log("📦 [WATCHES] Data:", JSON.stringify(result, null, 2));
     res.json({ success: true, data: result });
-  } catch (error) {
-    console.error("❌ [WATCHES] Error:", error);
+  } catch (error: any) {
+    console.error("❌ [WATCHES] Error:", error.message || error);
+    console.error("❌ [WATCHES] Error stack:", error.stack);
     res.status(500).json({ success: false, error: "فشل في جلب الساعات" });
   }
 });
@@ -236,8 +237,9 @@ router.get("/devices", async (req, res) => {
     console.log(`✅ [DEVICES] Query executed, found ${result.length} devices`);
     console.log("📦 [DEVICES] Data:", JSON.stringify(result, null, 2));
     res.json({ success: true, data: result });
-  } catch (error) {
-    console.error("❌ [DEVICES] Error:", error);
+  } catch (error: any) {
+    console.error("❌ [DEVICES] Error:", error.message || error);
+    console.error("❌ [DEVICES] Error stack:", error.stack);
     res.status(500).json({ success: false, error: "فشل في جلب الأجهزة" });
   }
 });
