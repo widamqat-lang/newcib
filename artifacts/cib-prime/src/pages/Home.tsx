@@ -171,42 +171,68 @@ export default function Home() {
 </div>
 
         {/* Services */}
-        <div className="w-full max-w-6xl mx-auto px-4 py-20" id="services">
-          <div className="text-center mb-12">
-            <h2 className="text-3xl md:text-4xl font-extrabold text-foreground mb-4">
-              اختر الخدمة المناسبة لك
-            </h2>
-            <p className="text-lg text-muted-foreground">
-              خدمات مصرفية متنوعة مُصممة خصيصاً لراحتك
-            </p>
-          </div>
-          
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-            {services.map((service, idx) => (
-              <div 
-                key={idx}
-                className="group bg-white rounded-2xl overflow-hidden shadow-sm border border-gray-100 hover:shadow-xl transition-all duration-300 hover:-translate-y-2"
-              >
-                <div className="h-3 bg-gradient-to-l from-blue-500 to-blue-700"></div>
-                <div className="p-8">
-                  <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-blue-500 to-blue-700 flex items-center justify-center mb-6 group-hover:scale-110 transition-transform duration-300">
-                    <service.icon className="w-8 h-8 text-white" />
-                  </div>
-                  <h3 className="text-xl font-bold text-foreground mb-3">{service.title}</h3>
-                  <p className="text-gray-500 mb-6 leading-relaxed">{service.desc}</p>
-                  <Link 
-                    href="/signup"
-                    className="inline-flex items-center gap-2 text-[#0a4fa3] font-semibold hover:gap-3 transition-all duration-300"
-                  >
-                    <span>{service.button}</span>
-                    <ChevronLeft className="w-4 h-4" />
-                  </Link>
-                </div>
-              </div>
-            ))}
-          </div>
+      <div className="w-full max-w-5xl mx-auto px-4 py-16" id="services">
+  
+  {/* الهيدر وقسم العنوان (مطابق تماماً للصورة الثانية والثالثة) */}
+  <div className="text-center mb-10">
+    <div className="inline-flex items-center gap-1.5 bg-[#f0f5fa] text-[#0b53a7] px-4 py-1.5 rounded-full text-xs font-bold mb-3 shadow-sm">
+      <Sparkles className="w-3.5 h-3.5" />
+      <span>خدماتنا</span>
+    </div>
+    <h2 className="text-2xl md:text-3xl font-black text-slate-900 mb-2 tracking-wide">
+      اختر الخدمة المناسبة لك
+    </h2>
+    <p className="text-sm text-slate-500 font-medium">
+      خدمات مصرفية متنوعة مصممة خصيصاً لراحتك
+    </p>
+    
+    {/* مؤشرات التبويب (Dots) المصممة في الصورة */}
+    <div className="flex justify-center gap-1.5 mt-4">
+      <span className="w-6 h-1.5 bg-[#0b53a7] rounded-full"></span>
+      <span className="w-2 h-1.5 bg-slate-300 rounded-full"></span>
+      <span className="w-2 h-1.5 bg-slate-300 rounded-full"></span>
+    </div>
+  </div>
+  
+  {/* قائمة عرض الخدمات - ترتيب عمودي متمركز بدلاً من Grid (مطابق للصورة الثالثة) */}
+  <div className="w-full max-w-xl mx-auto space-y-8">
+    {services.map((service, idx) => (
+      <div 
+        key={idx}
+        className="bg-white rounded-[2rem] overflow-hidden shadow-md border border-slate-100 p-5 flex flex-col items-center text-center"
+      >
+        {/* الصورة الخاصة بالخدمة مع الشارة العلوية (Badge) */}
+        <div className="w-full relative rounded-2xl overflow-hidden mb-5">
+          <span className="absolute top-3 right-3 bg-[#ea8c23] text-white text-[11px] font-bold px-3 py-1 rounded-lg z-10 flex items-center gap-1 shadow-sm">
+            <Star className="w-3 h-3 fill-white" /> {service.tag || "عرض حصري"}
+          </span>
+          {/* تأكد من تمرير رابط صورة صالح لكل خدمة في مصفوفة البيانات لديك */}
+          <img 
+            src={service.image || "https://images.unsplash.com/photo-1617814076367-b759c7d7e738?auto=format&fit=crop&w=600&q=80"} 
+            alt={service.title} 
+            className="w-full h-52 object-cover"
+          />
         </div>
 
+        {/* عنوان وتفاصيل الخدمة */}
+        <h3 className="text-xl font-bold text-slate-900 mb-2">{service.title}</h3>
+        <p className="text-sm text-slate-500 leading-relaxed mb-6 px-4 font-light">
+          {service.desc}
+        </p>
+
+        {/* زر الإجراء (Action Button) العريض مثل زر "سجل الآن" في الصورة */}
+        <Link 
+          href="/signup"
+          className="flex items-center justify-center gap-2 bg-[#0b53a7] hover:bg-[#073771] text-white font-bold py-3.5 w-full rounded-2xl text-sm transition-all shadow-sm"
+        >
+          <span>{service.button || "سجل الآن"}</span>
+          <ArrowLeft className="w-4 h-4" />
+        </Link>
+      </div>
+    ))}
+  </div>
+
+</div>
         {/* Why Us */}
         <div className="w-full bg-gradient-to-br from-gray-50 to-blue-50 py-20">
           <div className="w-full max-w-6xl mx-auto px-4">
