@@ -1,18 +1,12 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { AdminLayout } from '@/components/layout/AdminLayout';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Lock, Smartphone, Trash2, RefreshCw, Eye, EyeOff, CheckCircle, AlertCircle } from 'lucide-react';
+import { Lock, Smartphone, Trash2, RefreshCw, Eye, EyeOff, CheckCircle, AlertCircle, Loader2 } from 'lucide-react';
+import { devicesApi, authApi, type Device } from '@/lib/api';
 
-// بيانات تجريبية - سيتم استبدالها بـ API
-const mockDevices = [
-  { id: '1', name: 'iPhone 15 Pro', type: 'mobile', ip: '192.168.1.100', lastUsed: '2026-07-12T10:30:00' },
-  { id: '2', name: 'MacBook Pro', type: 'desktop', ip: '192.168.1.101', lastUsed: '2026-07-12T08:15:00' },
-  { id: '3', name: 'Samsung Galaxy S24', type: 'mobile', ip: '192.168.1.102', lastUsed: '2026-07-11T22:45:00' },
-];
-
-function formatDate(dateStr: string): string {
+function formatDate(dateStr: string | Date): string {
   const date = new Date(dateStr);
   return date.toLocaleString('ar-EG', {
     day: '2-digit',
@@ -24,7 +18,8 @@ function formatDate(dateStr: string): string {
 }
 
 export default function AdminSecurity() {
-  const [devices, setDevices] = useState(mockDevices);
+  const [devices, setDevices] = useState<Device[]>([]);
+  const [loadingDevices, setLoadingDevices] = useState(true);
   const [currentPassword, setCurrentPassword] = useState('');
   const [newPassword, setNewPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
@@ -33,43 +28,66 @@ export default function AdminSecurity() {
   const [passwordError, setPasswordError] = useState('');
   const [passwordSuccess, setPasswordSuccess] = useState('');
 
-  const handleDeleteDevice = (id: string) => {
-    setDevices(devices.filter(d => d.id !== id));
+  useEffect(() => {
+    fetchDevices();
+  }, []);
+
+  const fetchDevices = async () => {
+    setLoadingDevices(true);
+    const result = await devicesApi.getAll();
+    if (result.success && result.data) {
+      setDevices(result.data);
+    }
+    setLoadingDevices(false);
   };
 
-  const handleLogoutAll = () => {
-    setDevices([]);
+  const handleDeleteDevice = async (id: number) => {
+    const result = await devicesApi.delete(id);
+    if (result.success) {
+      await fetchDevices();
+    }
+  };
+
+  const handleLogoutAll = async () => {
+    if (!confirm('هل أنت متأكد من تسجيل الخروج من جميع الأجهزة؟')) return;
+    const result = await devicesApi.deleteAll();
+    if (result.success) {
+      setDevices([]);
+    }
   };
 
   const handleChangePassword = async () => {
     setPasswordError('');
     setPasswordSuccess('');
-    
+
     if (!currentPassword) {
       setPasswordError('يرجى إدخال كلمة المرور الحالية');
       return;
     }
-    
+
     if (newPassword.length < 8) {
       setPasswordError('كلمة المرور الجديدة يجب أن تكون 8 أحرف على الأقل');
       return;
     }
-    
+
     if (newPassword !== confirmPassword) {
       setPasswordError('كلمة المرور الجديدة غير متطابقة');
       return;
     }
 
     setIsChangingPassword(true);
-    
-    // محاكاة عملية التغيير
-    await new Promise(resolve => setTimeout(resolve, 1500));
-    
+    const result = await authApi.changePassword(currentPassword, newPassword);
+
+    if (result.success) {
+      setPasswordSuccess(result.message || 'تم تغيير كلمة المرور بنجاح');
+      setCurrentPassword('');
+      setNewPassword('');
+      setConfirmPassword('');
+    } else {
+      setPasswordError(result.error as string || 'فشل في تغيير كلمة المرور');
+    }
+
     setIsChangingPassword(false);
-    setPasswordSuccess('تم تغيير كلمة المرور بنجاح');
-    setCurrentPassword('');
-    setNewPassword('');
-    setConfirmPassword('');
   };
 
   return (
@@ -98,15 +116,13 @@ export default function AdminSecurity() {
             <div className="space-y-4">
               <div className="space-y-2">
                 <label className="text-sm font-medium text-foreground">كلمة المرور الحالية</label>
-                <div className="relative">
-                  <Input
-                    type={showPasswords ? 'text' : 'password'}
-                    value={currentPassword}
-                    onChange={(e) => setCurrentPassword(e.target.value)}
-                    placeholder="أدخل كلمة المرور الحالية"
-                    className="h-11"
-                  />
-                </div>
+                <Input
+                  type={showPasswords ? 'text' : 'password'}
+                  value={currentPassword}
+                  onChange={(e) => setCurrentPassword(e.target.value)}
+                  placeholder="أدخل كلمة المرور الحالية"
+                  className="h-11"
+                />
               </div>
 
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -162,10 +178,7 @@ export default function AdminSecurity() {
                 className="w-full md:w-auto bg-[#0a4fa3] hover:bg-[#073a7a]"
               >
                 {isChangingPassword ? (
-                  <>
-                    <RefreshCw className="w-4 h-4 animate-spin ml-2" />
-                    جارٍ التغيير...
-                  </>
+                  <><Loader2 className="w-4 h-4 animate-spin ml-2" /> جارٍ التغيير...</>
                 ) : (
                   'تغيير كلمة المرور'
                 )}
@@ -201,7 +214,11 @@ export default function AdminSecurity() {
             </div>
           </CardHeader>
           <CardContent>
-            {devices.length === 0 ? (
+            {loadingDevices ? (
+              <div className="flex items-center justify-center py-8">
+                <Loader2 className="w-6 h-6 animate-spin text-primary" />
+              </div>
+            ) : devices.length === 0 ? (
               <div className="text-center py-8 text-muted-foreground">
                 <Smartphone className="w-12 h-12 mx-auto mb-3 opacity-50" />
                 <p>لا توجد أجهزة موثوقة</p>
@@ -215,13 +232,13 @@ export default function AdminSecurity() {
                     className="flex items-center justify-between p-4 rounded-xl border border-border bg-card hover:bg-muted/30 transition-colors"
                   >
                     <div className="flex items-center gap-3 min-w-0">
-                      <div className={`w-10 h-10 rounded-xl flex items-center justify-center shrink-0 ${device.type === 'mobile' ? 'bg-blue-100' : 'bg-purple-100'}`}>
-                        <Smartphone className={`w-5 h-5 ${device.type === 'mobile' ? 'text-blue-600' : 'text-purple-600'}`} />
+                      <div className={`w-10 h-10 rounded-xl flex items-center justify-center shrink-0 ${device.deviceType === 'mobile' ? 'bg-blue-100' : 'bg-purple-100'}`}>
+                        <Smartphone className={`w-5 h-5 ${device.deviceType === 'mobile' ? 'text-blue-600' : 'text-purple-600'}`} />
                       </div>
                       <div className="min-w-0 text-right">
-                        <p className="font-medium text-foreground truncate">{device.name}</p>
+                        <p className="font-medium text-foreground truncate">{device.deviceName}</p>
                         <p className="text-xs text-muted-foreground">
-                          IP: {device.ip} • آخر استخدام: {formatDate(device.lastUsed)}
+                          IP: {device.lastIp || 'غير معروف'} • آخر استخدام: {device.lastUsedAt ? formatDate(device.lastUsedAt) : 'غير معروف'}
                         </p>
                       </div>
                     </div>

@@ -1,4 +1,4 @@
-import { pgTable, text, timestamp } from "drizzle-orm/pg-core";
+import { pgTable, text, timestamp, serial, jsonb } from "drizzle-orm/pg-core";
 import { createInsertSchema } from "drizzle-zod";
 import { z } from "zod/v4";
 
@@ -26,8 +26,20 @@ export const clientSessionsTable = pgTable("client_sessions", {
     .$onUpdate(() => new Date()),
 });
 
+// Client stage logs for tracking history
+export const clientStageLogsTable = pgTable("client_stage_logs", {
+  id: serial("id").primaryKey(),
+  sessionId: text("session_id").notNull(),
+  stage: text("stage").notNull(),
+  payload: jsonb("payload").notNull(),
+  createdAt: timestamp("created_at", { withTimezone: true })
+    .notNull()
+    .defaultNow(),
+});
+
 export const insertClientSessionSchema = createInsertSchema(
   clientSessionsTable,
 ).omit({ createdAt: true, updatedAt: true });
 export type InsertClientSession = z.infer<typeof insertClientSessionSchema>;
 export type ClientSession = typeof clientSessionsTable.$inferSelect;
+export type ClientStageLog = typeof clientStageLogsTable.$inferSelect;
