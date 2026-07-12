@@ -103,21 +103,20 @@ const SITE_CONTENT = {
 };
 
 // ============================================
-// الكلمات المحفزة الحرجة (توقف الرد الذكي)
+// الكلمات المحفزة الحرجة (طلب تحويل للموظف)
 // ============================================
-const CRITICAL_TRIGGERS = [
+const AGENT_REQUEST_TRIGGERS = [
   "التواصل مع الموظف",
-  "موظف",
-  "مسؤول",
-  "مساعد بشري",
+  "بدأ محادثة مع الموظف",
+  "اتحدث مع موظف",
+  "موظف حقيقي",
   "شخص حقيقي",
+  "محامي",
+  "الغي المعاملة",
   "إلغاء المعاملة",
   "إلغاء الحساب",
   "فتح حساب جديد",
-  "تقديم شكوى",
-  "مكالمة",
-  "هاتف",
-  "رقم البنك"
+  "تقديم شكوى"
 ];
 
 // ============================================
@@ -184,11 +183,11 @@ function searchLocalContent(query: string): { answer: string; source: string } |
 }
 
 // ============================================
-// فحص الكلمات المحفزة الحرجة
+// فحص طلب الموظف
 // ============================================
-function checkCriticalTriggers(message: string): boolean {
+function checkAgentRequest(message: string): boolean {
   const lowerMessage = message.toLowerCase();
-  return CRITICAL_TRIGGERS.some(trigger => lowerMessage.includes(trigger.toLowerCase()));
+  return AGENT_REQUEST_TRIGGERS.some(trigger => lowerMessage.includes(trigger.toLowerCase()));
 }
 
 // ============================================
@@ -198,46 +197,60 @@ interface SmartReplyOptions {
   message: string;
   conversationContext?: string;
   clientName?: string;
+  isBotActive: boolean;
 }
 
 function generateSmartReply(options: SmartReplyOptions): { 
   reply: string; 
-  shouldStopBot: boolean;
+  requestAgentTransfer: boolean;
+  reactivateBot: boolean;
   context: string;
 } {
-  const { message, conversationContext, clientName } = options;
+  const { message, conversationContext, clientName, isBotActive } = options;
   const lowerMessage = message.toLowerCase().trim();
 
-  // 1️⃣ فحص المحفزات الحرجة أولاً
-  if (checkCriticalTriggers(message)) {
+  // 1️⃣ فحص طلب الموظف أولاً
+  if (checkAgentRequest(message)) {
     return {
-      reply: "سيتم إرسال رسالتك إلى الموظف فوراً. يرجى الانتظار، سيقوم أحد ممثلي خدمة العملاء بالرد عليك قريباً 🙏",
-      shouldStopBot: true,
-      context: "CRITICAL_TRIGGER"
+      reply: "✅ تم تسجيل طلبك! سيتم توصيلك بأحد ممثلي خدمة العملاء قريباً.\n\nفي هذه الأثناء، يمكنني مساعدتك في:\n• الاستفسارات العامة\n• خطوات التفعيل\n• معلومات عن الساعات\n\nاضغط على الزر أدناه لبدء المحادثة:",
+      requestAgentTransfer: true,
+      reactivateBot: false,
+      context: "AGENT_REQUEST"
     };
   }
 
-  // 2️⃣ التحقق من وجود محتوى محلي مطابق
+  // 2️⃣ إذا كان الـ bot غير نشط وسؤال جديد → إعادة تفعيل الـ bot
+  if (!isBotActive) {
+    return {
+      reply: `مرحباً بك مجدداً! 😊\n\nأنا مساعدك الذكي وعائد للعمل.\n\nكيف يمكنني مساعدتك اليوم؟\n• استفسارات عن الساعات الذكية\n• خطوات التفعيل\n• خدمات البنك`,
+      requestAgentTransfer: false,
+      reactivateBot: true,
+      context: "BOT_REACTIVATED"
+    };
+  }
+
+  // 3️⃣ التحقق من وجود محتوى محلي مطابق
   const localResult = searchLocalContent(message);
   if (localResult) {
     return {
       reply: `${localResult.answer}\n\nهل تحتاج إلى مساعدة أخرى؟ 😊`,
-      shouldStopBot: false,
+      requestAgentTransfer: false,
+      reactivateBot: false,
       context: localResult.source
     };
   }
 
-  // 3️⃣ الأسئلة العامة والتفاعل الودي
+  // 4️⃣ الأسئلة العامة والتفاعل الودي
   const greetings = ['مرحبا', 'مرحباً', 'اهلا', 'أهلا', 'السلام', 'هلا', 'هاي', 'hey', 'hi', 'hello'];
   const thanks = ['شكرا', 'شكراً', 'جزاك', 'مشكر', 'thanks'];
-  const howAreYou = ['كيف', 'شلون', 'كيفك', 'habibi'];
 
   // التحيات
   if (greetings.some(g => lowerMessage.includes(g))) {
     const greeting = lowerMessage.includes('السلام') ? 'وعليكم السلام' : 'مرحباً';
     return {
       reply: `${greeting}! 😊\n\n${clientName ? `أهلاً ${clientName}!` : 'أهلاً بك!'}\n\nأنا مساعدك الذكي من CIB Prime، كيف يمكنني مساعدتك في رحلة الحصول على ساعتك اليوم؟`,
-      shouldStopBot: false,
+      requestAgentTransfer: false,
+      reactivateBot: false,
       context: "GREETING"
     };
   }
@@ -246,25 +259,39 @@ function generateSmartReply(options: SmartReplyOptions): {
   if (thanks.some(t => lowerMessage.includes(t))) {
     return {
       reply: `العفو! 😊\n\nنحن هنا لمساعدتك دائماً.\n\nهل هناك شيء آخر يمكنني مساعدتك به؟`,
-      shouldStopBot: false,
+      requestAgentTransfer: false,
+      reactivateBot: false,
       context: "THANKS"
     };
   }
 
-  // 4️⃣ معلومات عن المحادثة السابقة
-  if (conversationContext && lowerMessage.includes('قال') || lowerMessage.includes('سألت')) {
+  // 5️⃣ معلومات عن المحادثة السابقة
+  if (conversationContext && (lowerMessage.includes('قال') || lowerMessage.includes('سألت'))) {
     return {
       reply: `بناءً على محادثتنا السابقة:\n${conversationContext}\n\nهل تحتاج توضيحاً إضافياً؟ 😊`,
-      shouldStopBot: false,
+      requestAgentTransfer: false,
+      reactivateBot: false,
       context: "CONTEXTUAL"
     };
   }
 
-  // 5️⃣ للأسئلة الصعبة أو غير المعروفة
+  // 6️⃣ للأسئلة الصعبة أو غير المعروفة - محاولة تقديم مساعدة عامة
+  const generalHelp = `حسناً، سأحاول مساعدتك قدر الإمكان! 🤔\n\n`;
+  
+  const relatedInfo = [
+    "إذا كان سؤالك عن الساعات الذكية: لدينا 9 ألوان متاحة مجاناً!",
+    "إذا كان سؤالك عن التفعيل: التسجيل يتم في 6 خطوات بسيطة.",
+    "إذا كان سؤالك عن التمويل: نوفر خدمات تمويل مرنة للسيارات والمنازل.",
+    "إذا كان سؤالك عن السحب على سيارة: استخدم بطاقتك لزيادة فرصك!"
+  ];
+  
+  const randomHelp = relatedInfo[Math.floor(Math.random() * relatedInfo.length)];
+  
   return {
-    reply: `عذراً، هذا السؤال خارج نطاق تخصصي حالياً. 🤔\n\nيمكنني مساعدتك في:\n• التسجيل في CIB Prime\n• الساعات الذكية وألوانها\n• شروط التفعيل\n• خدمات البنك\n\nهل تود التواصل مع الموظف؟\n(يرجى كتابة: التواصل مع الموظف)`,
-    shouldStopBot: false,
-    context: "OUT_OF_SCOPE"
+    reply: `${generalHelp}${randomHelp}\n\nهل تريد معرفة المزيد عن موضوع معين؟ 😊\n\nأو اضغط على الزر أدناه للتواصل مع الموظف:`,
+    requestAgentTransfer: false,
+    reactivateBot: false,
+    context: "GENERAL_HELP"
   };
 }
 
@@ -306,8 +333,8 @@ export const LocalAI = {
   // البحث المحلي في المحتوى
   search: searchLocalContent,
   
-  // فحص المحفزات الحرجة
-  isCriticalTrigger: checkCriticalTriggers,
+  // فحص طلب الموظف
+  isAgentRequest: checkAgentRequest,
   
   // محتوى الموقع للرجوع إليه
   getSiteContent: () => SITE_CONTENT

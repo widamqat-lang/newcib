@@ -12,6 +12,7 @@ export const conversationsTable = pgTable("conversations", {
   messageCount: serial("message_count").notNull().default(0), // عداد الرسائل
   lastSummaryAt: timestamp("last_summary_at", { withTimezone: true }), // آخر تلخيص
   isAgentTransferRequested: boolean("is_agent_transfer_requested").notNull().default(false), // طلب تحويل للموظف
+  botActive: boolean("bot_active").notNull().default(true), // حالة الـ bot (نشط/صامت)
   createdAt: timestamp("created_at", { withTimezone: true })
     .notNull()
     .defaultNow(),

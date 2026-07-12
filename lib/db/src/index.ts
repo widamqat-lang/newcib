@@ -215,6 +215,11 @@ export async function ensureTables(): Promise<void> {
         await pool.query(`ALTER TABLE conversations ADD COLUMN is_agent_transfer_requested BOOLEAN NOT NULL DEFAULT false`);
         console.log('✅ Added is_agent_transfer_requested column to conversations table');
       }
+      
+      if (!existingColumns.has('bot_active')) {
+        await pool.query(`ALTER TABLE conversations ADD COLUMN bot_active BOOLEAN NOT NULL DEFAULT true`);
+        console.log('✅ Added bot_active column to conversations table');
+      }
     } catch (e) {
       console.error('Migration error for conversations:', e);
     }

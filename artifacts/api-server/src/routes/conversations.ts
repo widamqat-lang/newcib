@@ -225,14 +225,6 @@ router.post("/:id/messages", async (req, res) => {
         .orderBy(desc(conversationSummariesTable.createdAt))
         .limit(1);
 
-      // الحصول على آخر 3 رسائل
-      const recentMessages = await db
-        .select()
-        .from(messagesTable)
-        .where(eq(messagesTable.conversationId, conversationId))
-        .orderBy(desc(messagesTable.createdAt))
-        .limit(6);
-
       // الحصول على بيانات العميل
       let clientName = "عميلنا العزيز";
       if (conversation?.clientSessionId) {
@@ -249,30 +241,38 @@ router.post("/:id/messages", async (req, res) => {
       const aiResult = LocalAI.generateReply({
         message: content,
         conversationContext: lastSummary?.summary || undefined,
-        clientName
+        clientName,
+        isBotActive: conversation?.botActive ?? true
       });
 
       console.log("[MESSAGES] AI Result:", { 
-        shouldStopBot: aiResult.shouldStopBot, 
+        requestAgentTransfer: aiResult.requestAgentTransfer,
+        reactivateBot: aiResult.reactivateBot,
         context: aiResult.context 
       });
 
-      // إذا كان طلب تحويل للموظف
-      if (aiResult.shouldStopBot) {
-        await db
-          .update(conversationsTable)
-          .set({ isAgentTransferRequested: true })
-          .where(eq(conversationsTable.id, conversationId));
+      // تحديث حالة المحادثة بناءً على نتيجة الذكاء الاصطناعي
+      const updateData: Record<string, unknown> = {
+        isAgentTransferRequested: aiResult.requestAgentTransfer,
+        botActive: !aiResult.requestAgentTransfer // إذا طلب موظف → صمت الـ bot
+      };
+
+      // إذا أعاد الـ bot نشاطه
+      if (aiResult.reactivateBot) {
+        updateData.botActive = true;
       }
 
-      // إضافة رد الذكاء الاصطناعي (إذا لم يكن طلب موظف)
-      if (!aiResult.shouldStopBot) {
-        await db.insert(messagesTable).values({
-          conversationId,
-          senderType: "bot",
-          content: aiResult.reply,
-        });
-      }
+      await db
+        .update(conversationsTable)
+        .set(updateData)
+        .where(eq(conversationsTable.id, conversationId));
+
+      // إضافة رد الذكاء الاصطناعي
+      await db.insert(messagesTable).values({
+        conversationId,
+        senderType: "bot",
+        content: aiResult.reply,
+      });
 
       // تلخيص المحادثة بعد كل 3 رسائل جديدة
       const messageCount = (conversation?.messageCount || 0) + 1;
@@ -314,7 +314,8 @@ router.post("/:id/messages", async (req, res) => {
       res.json({ 
         success: true, 
         data: updatedMessages,
-        isAgentTransferRequested: aiResult.shouldStopBot
+        isAgentTransferRequested: aiResult.requestAgentTransfer,
+        botActive: aiResult.reactivateBot || !aiResult.requestAgentTransfer
       });
       return;
     }
