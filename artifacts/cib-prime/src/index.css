@@ -37,35 +37,44 @@
 }
 
 :root {
-  /* Dark Luxury Banking Theme */
-  --background: 222 47% 7%;
-  --foreground: 210 40% 98%;
+  /* 🏛️ Official Premium Government/Banking Theme */
   
-  --border: 217 33% 17%;
-  --input: 217 33% 17%;
-  --ring: 43 74% 49%;
+  /* خلفية بيضاء نقية 100% للنقاء وسهولة القراءة */
+  --background: 0 0% 100%;
   
-  --card: 222 47% 10%;
-  --card-foreground: 210 40% 98%;
-  --card-border: 217 33% 17%;
+  /* نصوص كحلية داكنة جداً متناسقة مع هوية الموقع */
+  --foreground: 214 60% 12%;
+  
+  /* حواف رمادية ناعمة جداً لمنع التشتت البصري */
+  --border: 214 30% 92%;
+  --input: 214 30% 92%;
+  --ring: 213 75% 37%; /* نفس درجة الأزرق الرسمي للتركيز */
+  
+  /* 🃏 الصناديق والبطاقات (أوف وايت / رمادي ثلجي خفيف ومريح) */
+  --card: 214 30% 97%;
+  --card-foreground: 214 60% 12%;
+  --card-border: 214 30% 92%;
 
-  /* Golden accents */
-  --primary: 43 74% 49%;
-  --primary-foreground: 222 47% 5%;
+  /* 🏛️ لون رأس الصفحة والهوية الأساسي: الأزرق الملكي المعتمد #1858a8 */
+  --primary: 213 75% 37%;
+  --primary-foreground: 0 0% 100%;
 
-  --secondary: 217 33% 17%;
-  --secondary-foreground: 210 40% 98%;
+  /* الألوان المساعدة والأقسام الفرعية */
+  --secondary: 214 30% 96%;
+  --secondary-foreground: 213 75% 37%;
 
-  --muted: 217 33% 17%;
-  --muted-foreground: 215 20.2% 65.1%;
+  --muted: 214 30% 96%;
+  --muted-foreground: 214 16% 50%;
 
-  --accent: 217 33% 17%;
-  --accent-foreground: 210 40% 98%;
+  --accent: 214 30% 92%;
+  --accent-foreground: 213 75% 37%;
 
-  --destructive: 0 84.2% 60.2%;
-  --destructive-foreground: 210 40% 98%;
+  /* الأحمر التحذيري للعمليات الحساسة */
+  --destructive: 0 84.2% 55%;
+  --destructive-foreground: 0 0% 100%;
 
-  --radius: 0.75rem;
+  /* انحناءات هندسية رسمية وثابتة للمنصات الكبيرة */
+  --radius: 0.625rem;
 }
 
 @layer base {
@@ -74,6 +83,6 @@
   }
 
   body {
-    @apply font-sans antialiased bg-background text-foreground;
+    @apply font-sans antialiased bg-background text-foreground selection:bg-primary/10 selection:text-primary;
   }
 }
