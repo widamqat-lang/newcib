@@ -140,14 +140,23 @@ export default function Home() {
             </div>
           </div>
 
-          {/* 🌊 التدرج الانسيابي السفلي المندمج تماماً مع المنحنى بدون أي فواصل بيضاء أو سوداء */}
-          <div className="absolute bottom-0 left-0 right-0 w-full overflow-hidden leading-none z-10 pointer-events-none select-none">
-            <div className="w-full h-20 bg-gradient-to-b from-transparent via-[#032249]/50 to-[#032249]"></div>
-            <svg viewBox="0 0 1200 120" preserveAspectRatio="none" className="relative block w-full h-[60px] fill-white text-white">
-              <path d="M0,0 C300,95 900,95 1200,0 L1200,120 L0,120 Z" className="fill-white"></path>
-            </svg>
-          </div>
-        </div>
+         {/* 🌊 التدرج الانسيابي السفلي المندمج مع المنحنى المائل بدقة (مطابق للصورة) */}
+<div className="absolute bottom-0 left-0 right-0 w-full overflow-hidden leading-none z-10 pointer-events-none select-none">
+  {/* تدرج داكن خفيف فوق المنحنى مباشرة ليعطي عمقاً للتصميم الأزرق */}
+  <div className="w-full h-24 bg-gradient-to-b from-transparent to-[#032249]/30"></div>
+  
+  {/* رسمة المنحنى الانسيابي غير المتناظر بدقة عالية */}
+  <svg 
+    viewBox="0 0 1440 160" 
+    preserveAspectRatio="none" 
+    className="relative block w-full h-[70px] sm:h-[90px] fill-white text-white -mb-[1px]"
+  >
+    <path 
+      d="M0,64 C240,140 480,160 720,105 C960,50 1200,10 1440,75 L1440,160 L0,160 Z" 
+      className="fill-white"
+    ></path>
+  </svg>
+</div>
 
         {/* Stats - تم الحفاظ على الكرت ليرتفع فوق المنحنى بنعومة وبدون فراغ غريب */}
         <div className="w-full max-w-5xl mx-auto px-4 -mt-12 relative z-20">
