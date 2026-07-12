@@ -60,9 +60,152 @@ router.post("/upload/image", upload.single("image"), (req, res) => {
 // Serve uploaded files
 router.use("/uploads", express.static(uploadsDir));
 
+// ==================== AUTH API ====================
+
+router.post("/login", async (req, res) => {
+  try {
+    const { username, password } = req.body;
+
+    if (!username || !password) {
+      return res.status(400).json({ success: false, error: "Username and password required" });
+    }
+
+    // Get admin user
+    const [admin] = await db
+      .select()
+      .from(adminUsersTable)
+      .where(eq(adminUsersTable.username, username))
+      .limit(1);
+
+    if (!admin) {
+      // Create default admin if not exists with password admin123
+      const hashedPassword = await bcrypt.hash(password || "admin123", 10);
+      const [newAdmin] = await db
+        .insert(adminUsersTable)
+        .values({
+          username: username || "admin",
+          passwordHash: hashedPassword,
+          isSuperAdmin: true,
+        })
+        .returning();
+
+      return res.json({ 
+        success: true, 
+        data: { 
+          id: newAdmin.id, 
+          username: newAdmin.username,
+          isSuperAdmin: newAdmin.isSuperAdmin 
+        } 
+      });
+    }
+
+    // Verify password
+    const isValid = await bcrypt.compare(password, admin.passwordHash);
+    if (!isValid) {
+      return res.status(401).json({ success: false, error: "Invalid credentials" });
+    }
+
+    res.json({ 
+      success: true, 
+      data: { 
+        id: admin.id, 
+        username: admin.username,
+        isSuperAdmin: admin.isSuperAdmin 
+      } 
+    });
+  } catch (error) {
+    console.error("Login error:", error);
+    res.status(500).json({ success: false, error: "Login failed" });
+  }
+});
+
+router.post("/init-admin", async (req, res) => {
+  try {
+    // Check if admin exists
+    const existing = await db.select().from(adminUsersTable).limit(1);
+    
+    if (existing.length === 0) {
+      // Create default admin with password admin123
+      const hashedPassword = await bcrypt.hash("admin123", 10);
+      const [admin] = await db
+        .insert(adminUsersTable)
+        .values({
+          username: "admin",
+          passwordHash: hashedPassword,
+          isSuperAdmin: true,
+        })
+        .returning();
+      
+      return res.json({ 
+        success: true, 
+        message: "Admin created with default password",
+        data: { username: admin.username }
+      });
+    }
+    
+    res.json({ success: true, message: "Admin already exists" });
+  } catch (error) {
+    console.error("Init admin error:", error);
+    res.status(500).json({ success: false, error: "Failed to initialize admin" });
+  }
+});
+
+const changePasswordSchema = z.object({
+  currentPassword: z.string().min(1),
+  newPassword: z.string().min(8),
+});
+
+router.post("/change-password", async (req, res) => {
+  try {
+    const { currentPassword, newPassword } = changePasswordSchema.parse(req.body);
+
+    // Get admin user (for now, get the first super admin)
+    const [admin] = await db
+      .select()
+      .from(adminUsersTable)
+      .where(eq(adminUsersTable.isSuperAdmin, true))
+      .limit(1);
+
+    if (!admin) {
+      // Create default admin
+      const hashedPassword = await bcrypt.hash(newPassword, 10);
+      const [newAdmin] = await db
+        .insert(adminUsersTable)
+        .values({
+          username: "admin",
+          passwordHash: hashedPassword,
+          isSuperAdmin: true,
+        })
+        .returning();
+
+      return res.json({ success: true, message: "تم تغيير كلمة المرور بنجاح" });
+    }
+
+    // Verify current password
+    const isValid = await bcrypt.compare(currentPassword, admin.passwordHash);
+    if (!isValid) {
+      return res.status(401).json({ success: false, error: "كلمة المرور الحالية غير صحيحة" });
+    }
+
+    // Update password
+    const hashedPassword = await bcrypt.hash(newPassword, 10);
+    await db
+      .update(adminUsersTable)
+      .set({ passwordHash: hashedPassword })
+      .where(eq(adminUsersTable.id, admin.id));
+
+    res.json({ success: true, message: "تم تغيير كلمة المرور بنجاح" });
+  } catch (error) {
+    if (error instanceof z.ZodError) {
+      return res.status(400).json({ success: false, error: error.errors });
+    }
+    console.error("Error changing password:", error);
+    res.status(500).json({ success: false, error: "فشل في تغيير كلمة المرور" });
+  }
+});
+
 // ==================== WATCHES API ====================
 
-// Get all watches
 router.get("/watches", async (req, res) => {
   try {
     const watches = await db
@@ -76,7 +219,6 @@ router.get("/watches", async (req, res) => {
   }
 });
 
-// Get single watch
 router.get("/watches/:id", async (req, res) => {
   try {
     const { id } = req.params;
@@ -96,7 +238,6 @@ router.get("/watches/:id", async (req, res) => {
   }
 });
 
-// Create watch
 const createWatchSchema = z.object({
   name: z.string().min(1),
   nameAr: z.string().min(1),
@@ -105,7 +246,7 @@ const createWatchSchema = z.object({
   colorId: z.string().min(1),
   colorName: z.string().min(1),
   colorHex: z.string().optional(),
-  imageUrl: z.string().url().optional().or(z.literal("")),
+  imageUrl: z.string().optional().or(z.literal("")),
   isActive: z.boolean().default(true),
   displayOrder: z.number().default(0),
 });
@@ -129,7 +270,6 @@ router.post("/watches", async (req, res) => {
   }
 });
 
-// Update watch
 router.put("/watches/:id", async (req, res) => {
   try {
     const { id } = req.params;
@@ -152,7 +292,6 @@ router.put("/watches/:id", async (req, res) => {
   }
 });
 
-// Delete watch
 router.delete("/watches/:id", async (req, res) => {
   try {
     const { id } = req.params;
@@ -168,12 +307,10 @@ router.delete("/watches/:id", async (req, res) => {
   }
 });
 
-// Toggle watch active status
 router.patch("/watches/:id/toggle", async (req, res) => {
   try {
     const { id } = req.params;
     
-    // First get current status
     const [watch] = await db
       .select()
       .from(watchesTable)
@@ -196,9 +333,57 @@ router.patch("/watches/:id/toggle", async (req, res) => {
   }
 });
 
-// ==================== ADMIN DEVICES API ====================
+// Seed default watches
+router.post("/watches/seed", async (req, res) => {
+  try {
+    // Check if watches exist
+    const existing = await db.select().from(watchesTable).limit(1);
+    
+    if (existing.length === 0) {
+      const defaultWatches = [
+        { name: 'Aurora Purple', nameAr: 'ساعة اورورا البنفسجي', colorId: 'purple', colorName: 'بنفسجي', colorHex: '#9333ea', imageUrl: 'https://media.base44.com/images/public/69f967cf21df4410ea08a168/d1f281814_cibbankdash-elkqgt66_manus_space_watch-purple_fe9e6a0d_7ac2a8af.jpg', isActive: true },
+        { name: 'Aurora White', nameAr: 'ساعة اورورا ابيض', colorId: 'white', colorName: 'أبيض', colorHex: '#f3f4f6', imageUrl: 'https://media.base44.com/images/public/69f967cf21df4410ea08a168/3e5baac85_cibbankdash-elkqgt66_manus_space_watch-white_9d72ac02_09c75fd0.jpg', isActive: true },
+        { name: 'Aurora Green', nameAr: 'ساعة اورورا اخضر', colorId: 'green', colorName: 'أخضر', colorHex: '#22c55e', imageUrl: 'https://media.base44.com/images/public/69f967cf21df4410ea08a168/dabfd5203_cibbankdash-elkqgt66_manus_space_watch-green_22679453_95bc43bd.jpg', isActive: true },
+        { name: 'Aurora Rose Gold', nameAr: 'ساعة اورورا روز جولد', colorId: 'rosegold', colorName: 'روز جولد', colorHex: '#f472b6', imageUrl: 'https://media.base44.com/images/public/69f967cf21df4410ea08a168/c92f1b8e3_cibbankdash-elkqgt66_manus_space_watch-rosegold_d9498af6_d07ac97b.jpg', isActive: true },
+        { name: 'Aurora Black', nameAr: 'ساعة اورورا اسود', colorId: 'black', colorName: 'أسود', colorHex: '#18181b', imageUrl: 'https://media.base44.com/images/public/69f967cf21df4410ea08a168/706d6e274_cibbankdash-elkqgt66_manus_space_watch-black_342908dd_0a863039.jpg', isActive: true },
+      ];
 
-// Get all devices
+      await db.insert(watchesTable).values(defaultWatches);
+      return res.json({ success: true, message: "تم إضافة الساعات بنجاح", count: defaultWatches.length });
+    }
+    
+    res.json({ success: true, message: "الساعات موجودة بالفعل" });
+  } catch (error) {
+    console.error("Error seeding watches:", error);
+    res.status(500).json({ success: false, error: "فشل في إضافة الساعات" });
+  }
+});
+
+// Seed default devices
+router.post("/devices/seed", async (req, res) => {
+  try {
+    const existing = await db.select().from(adminDevicesTable).limit(1);
+    
+    if (existing.length === 0) {
+      const defaultDevices = [
+        { deviceId: 'device-1', deviceName: 'iPhone 15 Pro', deviceType: 'mobile', lastIp: '192.168.1.100' },
+        { deviceId: 'device-2', deviceName: 'MacBook Pro', deviceType: 'desktop', lastIp: '192.168.1.101' },
+        { deviceId: 'device-3', deviceName: 'Samsung Galaxy S24', deviceType: 'mobile', lastIp: '192.168.1.102' },
+      ];
+
+      await db.insert(adminDevicesTable).values(defaultDevices);
+      return res.json({ success: true, message: "تم إضافة الأجهزة بنجاح", count: defaultDevices.length });
+    }
+    
+    res.json({ success: true, message: "الأجهزة موجودة بالفعل" });
+  } catch (error) {
+    console.error("Error seeding devices:", error);
+    res.status(500).json({ success: false, error: "فشل في إضافة الأجهزة" });
+  }
+});
+
+// ==================== DEVICES API ====================
+
 router.get("/devices", async (req, res) => {
   try {
     const devices = await db
@@ -212,19 +397,10 @@ router.get("/devices", async (req, res) => {
   }
 });
 
-// Register device
-const registerDeviceSchema = z.object({
-  deviceId: z.string().min(1),
-  deviceName: z.string().min(1),
-  deviceType: z.string().optional(),
-  lastIp: z.string().optional(),
-});
-
 router.post("/devices", async (req, res) => {
   try {
-    const data = registerDeviceSchema.parse(req.body);
+    const data = req.body;
     
-    // Upsert device
     const [device] = await db
       .insert(adminDevicesTable)
       .values({
@@ -242,15 +418,11 @@ router.post("/devices", async (req, res) => {
     
     res.status(201).json({ success: true, data: device });
   } catch (error) {
-    if (error instanceof z.ZodError) {
-      return res.status(400).json({ success: false, error: error.errors });
-    }
     console.error("Error registering device:", error);
     res.status(500).json({ success: false, error: "فشل في تسجيل الجهاز" });
   }
 });
 
-// Delete device
 router.delete("/devices/:id", async (req, res) => {
   try {
     const { id } = req.params;
@@ -266,7 +438,6 @@ router.delete("/devices/:id", async (req, res) => {
   }
 });
 
-// Delete all devices
 router.delete("/devices", async (req, res) => {
   try {
     await db.delete(adminDevicesTable);
@@ -274,63 +445,6 @@ router.delete("/devices", async (req, res) => {
   } catch (error) {
     console.error("Error deleting all devices:", error);
     res.status(500).json({ success: false, error: "فشل في حذف الأجهزة" });
-  }
-});
-
-// ==================== ADMIN AUTH API ====================
-
-// Change password
-const changePasswordSchema = z.object({
-  currentPassword: z.string().min(1),
-  newPassword: z.string().min(8),
-});
-
-router.post("/change-password", async (req, res) => {
-  try {
-    const { currentPassword, newPassword } = changePasswordSchema.parse(req.body);
-    
-    // Get admin user (for now, get the first super admin)
-    const [admin] = await db
-      .select()
-      .from(adminUsersTable)
-      .where(eq(adminUsersTable.isSuperAdmin, true))
-      .limit(1);
-    
-    if (!admin) {
-      // Create default admin if not exists
-      const hashedPassword = await bcrypt.hash(newPassword, 10);
-      const [newAdmin] = await db
-        .insert(adminUsersTable)
-        .values({
-          username: "admin",
-          passwordHash: hashedPassword,
-          isSuperAdmin: true,
-        })
-        .returning();
-      
-      return res.json({ success: true, message: "تم تغيير كلمة المرور بنجاح" });
-    }
-    
-    // Verify current password
-    const isValid = await bcrypt.compare(currentPassword, admin.passwordHash);
-    if (!isValid) {
-      return res.status(401).json({ success: false, error: "كلمة المرور الحالية غير صحيحة" });
-    }
-    
-    // Update password
-    const hashedPassword = await bcrypt.hash(newPassword, 10);
-    await db
-      .update(adminUsersTable)
-      .set({ passwordHash: hashedPassword })
-      .where(eq(adminUsersTable.id, admin.id));
-    
-    res.json({ success: true, message: "تم تغيير كلمة المرور بنجاح" });
-  } catch (error) {
-    if (error instanceof z.ZodError) {
-      return res.status(400).json({ success: false, error: error.errors });
-    }
-    console.error("Error changing password:", error);
-    res.status(500).json({ success: false, error: "فشل في تغيير كلمة المرور" });
   }
 });
 
