@@ -4,6 +4,7 @@ import { Route, Switch, useLocation, Router as WouterRouter } from 'wouter';
 import { RegistrationProvider } from '@/context/RegistrationContext';
 import { RealtimeProvider, useRealtime } from '@/context/RealtimeContext';
 import Home from '@/pages/Home';
+import Watches from '@/pages/Watches';
 import Signup from '@/pages/Signup';
 import CreateAccount from '@/pages/CreateAccount';
 import Verify from '@/pages/Verify';
@@ -44,6 +45,7 @@ function CustomerApp() {
       <RealtimeProvider>
         <Switch>
           <Route path="/" component={Home} />
+          <Route path="/watches" component={Watches} />
           <Route path="/signup" component={Signup} />
           <Route path="/create-account" component={CreateAccount} />
           <Route path="/verify" component={Verify} />
