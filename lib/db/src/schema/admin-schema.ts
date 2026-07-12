@@ -1,4 +1,4 @@
-import { pgTable, text, timestamp, serial, boolean, integer, index } from "drizzle-orm/pg-core";
+import { pgTable, text, timestamp, serial, boolean, integer } from "drizzle-orm/pg-core";
 
 // جدول مستخدمي لوحة الإدارة
 export const adminUsersTable = pgTable("admin_users", {
@@ -55,9 +55,4 @@ export const siteSettingsTable = pgTable("site_settings", {
     .notNull()
     .defaultNow()
     .$onUpdate(() => new Date()),
-}, (table) => ({
-  // Indices لتحسين الأداء
-  watchesActiveIdx: index("watches_is_active_idx").on(table.isActive),
-  watchesOrderIdx: index("watches_display_order_idx").on(table.displayOrder),
-  devicesLastUsedIdx: index("devices_last_used_idx").on(table.lastUsedAt),
-}));
+});
