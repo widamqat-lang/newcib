@@ -1,0 +1,13 @@
+[railway]
+  wordpress = "2"
+
+[deployment]
+  port = 3001
+
+[build]
+  dockerfile = "Dockerfile"
+
+[environment]
+  NODE_ENV = "production"
+  PORT = "3001"
+  DATABASE_URL = "postgresql://neondb_owner:npg_sXUDcr7dQFZ4@ep-noisy-mode-atmhieni-pooler.c-9.us-east-1.aws.neon.tech/neondb?sslmode=require"

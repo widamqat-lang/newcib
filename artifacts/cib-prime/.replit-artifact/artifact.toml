@@ -1,0 +1,27 @@
+kind = "web"
+previewPath = "/"
+title = "CIB Prime"
+version = "1.0.0"
+id = "artifacts/cib-prime"
+router = "path"
+
+[[services]]
+name = "web"
+paths = [ "/" ]
+localPort = 25861
+
+[services.development]
+run = "pnpm --filter @workspace/cib-prime run dev"
+
+[services.production]
+build = [ "pnpm", "--filter", "@workspace/cib-prime", "run", "build" ]
+serve = "static"
+publicDir = "artifacts/cib-prime/dist/public"
+
+[[services.production.rewrites]]
+from = "/*"
+to = "/index.html"
+
+[services.env]
+PORT = "25861"
+BASE_PATH = "/"
