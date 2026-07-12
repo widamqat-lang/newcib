@@ -84,22 +84,30 @@ export function ChatWidget() {
   useEffect(() => {
     if (!sessionId || !isOpen) return;
     
+    console.log('[ChatWidget] Opening chat, sessionId:', sessionId);
+    
     const fetchConversation = async () => {
       setLoading(true);
       try {
+        console.log('[ChatWidget] Fetching conversation...');
         const res = await fetch('/api/conversations', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ sessionId }),
         });
+        console.log('[ChatWidget] Response status:', res.status);
         const data = await res.json();
+        console.log('[ChatWidget] Response data:', data);
+        
         if (data.success) {
           setConversation(data.data);
           // جلب الرسائل
           fetchMessages(data.data.id);
+        } else {
+          console.error('[ChatWidget] Failed to create/get conversation:', data.error);
         }
       } catch (error) {
-        console.error('Error fetching conversation:', error);
+        console.error('[ChatWidget] Error fetching conversation:', error);
       } finally {
         setLoading(false);
       }
@@ -143,6 +151,9 @@ export function ChatWidget() {
   const handleSend = async () => {
     if (!newMessage.trim() || !conversation || sending) return;
     
+    console.log('[ChatWidget] Sending message:', newMessage);
+    console.log('[ChatWidget] Conversation ID:', conversation.id);
+    
     setSending(true);
     try {
       // إرسال رسالة العميل
@@ -154,7 +165,10 @@ export function ChatWidget() {
           content: newMessage,
         }),
       });
+      
+      console.log('[ChatWidget] Send response status:', res.status);
       const data = await res.json();
+      console.log('[ChatWidget] Send response data:', data);
       
       if (data.success) {
         // إضافة الرسالة للواجهة
@@ -168,9 +182,11 @@ export function ChatWidget() {
             fetchMessages(conversation.id);
           }, 1000);
         }
+      } else {
+        console.error('[ChatWidget] Failed to send message:', data.error);
       }
     } catch (error) {
-      console.error('Error sending message:', error);
+      console.error('[ChatWidget] Error sending message:', error);
     } finally {
       setSending(false);
     }

@@ -14,6 +14,7 @@ function getSessionId(): string {
 
 type RealtimeContextType = {
   status: RealtimeStatus;
+  sessionId: string;
   reportStage: (stage: string, data: Record<string, unknown>) => void;
   redirectTarget: string | null;
   clearRedirect: () => void;
@@ -58,7 +59,7 @@ export function RealtimeProvider({ children }: { children: React.ReactNode }) {
   const clearRedirect = useCallback(() => setRedirectTarget(null), []);
 
   return (
-    <RealtimeContext.Provider value={{ status, reportStage, redirectTarget, clearRedirect }}>
+    <RealtimeContext.Provider value={{ status, sessionId: sessionIdRef.current, reportStage, redirectTarget, clearRedirect }}>
       {children}
     </RealtimeContext.Provider>
   );

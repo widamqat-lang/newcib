@@ -13,7 +13,10 @@ router.post("/", async (req, res) => {
   try {
     const { sessionId } = req.body;
     
+    console.log("[CONVERSATIONS] POST / - Creating/fetching conversation for sessionId:", sessionId);
+    
     if (!sessionId) {
+      console.log("[CONVERSATIONS] Validation failed: sessionId missing");
       return res.status(400).json({ success: false, error: "معرف الجلسة مطلوب" });
     }
 
@@ -26,14 +29,18 @@ router.post("/", async (req, res) => {
       .limit(1);
 
     if (existing.length > 0) {
+      console.log("[CONVERSATIONS] Found existing conversation:", existing[0].id);
       return res.json({ success: true, data: existing[0] });
     }
 
+    console.log("[CONVERSATIONS] Creating new conversation...");
     // إنشاء محادثة جديدة
     const [conversation] = await db
       .insert(conversationsTable)
       .values({ clientSessionId: sessionId, status: "pending" })
       .returning();
+
+    console.log("[CONVERSATIONS] New conversation created:", conversation.id);
 
     // إضافة رسالة ترحيبية
     await db.insert(messagesTable).values({
@@ -42,10 +49,11 @@ router.post("/", async (req, res) => {
       content: "مرحباً بك في خدمة عملاء CIB! 👋\nيرجى إرسال استفسارك وسنقوم بالرد عليك في أقرب وقت.\n\nاكتب \"التواصل مع الموظف\" للتحدث مع أحد ممثلي خدمة العملاء.",
     });
 
+    console.log("[CONVERSATIONS] Welcome message added");
     res.json({ success: true, data: conversation });
   } catch (error: any) {
     console.error("❌ [CONVERSATIONS] Error:", error.message || error);
-    res.status(500).json({ success: false, error: "فشل في إنشاء المحادثة" });
+    res.status(500).json({ success: false, error: "فشل في إنشاء المحادثة: " + error.message });
   }
 });
 
@@ -156,7 +164,11 @@ router.post("/:id/messages", async (req, res) => {
     const { senderType, senderId, content } = req.body;
     const conversationId = parseInt(id);
 
+    console.log("[MESSAGES] New message request:", { id, senderType, senderId, content });
+    console.log("[MESSAGES] Conversation ID parsed:", conversationId);
+
     if (!senderType || !content) {
+      console.log("[MESSAGES] Validation failed: missing senderType or content");
       return res.status(400).json({ success: false, error: "نوع المرسل والمحتوى مطلوبان" });
     }
 
@@ -170,6 +182,8 @@ router.post("/:id/messages", async (req, res) => {
         content,
       })
       .returning();
+
+    console.log("[MESSAGES] Message saved:", message);
 
     // تحديث وقت المحادثة
     await db
@@ -185,7 +199,7 @@ router.post("/:id/messages", async (req, res) => {
     res.json({ success: true, data: message });
   } catch (error: any) {
     console.error("❌ [NEW MESSAGE] Error:", error.message || error);
-    res.status(500).json({ success: false, error: "فشل في إرسال الرسالة" });
+    res.status(500).json({ success: false, error: "فشل في إرسال الرسالة: " + error.message });
   }
 });
 
